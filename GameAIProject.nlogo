@@ -1,22 +1,55 @@
+breed [player player1]
 
 to setup
 clear-all
 setup-patches
-setup-turtles
+setup-player
 reset-ticks
 end
 to setup-patches
   ask patches [ set pcolor grey]
 end
 
-to setup-turtles
-  create-turtles 1 [setxy 250 250]
+to setup-player
+  set-default-shape player "arrow"
+  create-Player 1
+  [
+    set color blue
+    set size 1.5
+    setxy 10 10
+    facexy 10 0
+  ]
+end
+
+to Move_Forward
+  ask player[
+    fd 2
+  ]
+end
+
+to Turn_Left
+  ask player[
+    lt 90
+  ]
+end
+to Turn_Right
+  ask player[
+    rt 90
+  ]
+ 
+end
+
+
+to Backwards
+  ask player[
+    bk 2
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+315
 10
-649
+754
 470
 16
 16
@@ -41,12 +74,80 @@ ticks
 30.0
 
 BUTTON
-47
-62
-111
-95
+104
+86
+168
+119
 Setup
 Setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+98
+149
+176
+182
+Forward
+Move_Forward
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+3
+150
+69
+183
+Turn Left
+Turn_Left
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+197
+151
+275
+184
+Turn Right
+Turn_Right
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+101
+211
+172
+244
+NIL
+Backwards
 NIL
 1
 T
