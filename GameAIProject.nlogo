@@ -1,9 +1,23 @@
 breed [player player1]
+breed [enemy enemy1]
+enemy-own 
+[
+  state
+]
+
+player-own
+[
+  level
+]
+
 
 to setup
 clear-all
 setup-patches
 setup-player
+setup-enemy
+ask enemy [set state "patrol"]
+patrol-state
 reset-ticks
 end
 to setup-patches
@@ -21,19 +35,77 @@ to setup-player
   ]
 end
 
+to setup-enemy
+  set-default-shape enemy "arrow"
+  create-Enemy 1
+  [
+    set color red
+    set size 1.5
+    setxy 10 20
+    facexy 10 0
+  ]
+end
+
+to patrol-button
+  ask enemy [set state "patrol"]
+  patrol-state
+  ask enemy [print state]
+end
+
+to patrol-state
+    ask enemy
+    [
+      if state = "persue"
+      [
+        persue-state
+      ]
+      
+    ]
+end
+
+to persue-button
+  ask enemy [set state "persue"]
+  persue-state
+  ask enemy [print state]
+end
+
+to persue-state
+    ask enemy
+    [
+      if state = "attack"
+      [
+        attack-state
+      ]
+      
+    ]
+end
+
+to attack-button
+  ask enemy [set state "attack"]
+  attack-state
+  ask enemy [print state]
+end
+
+to attack-state
+    
+end
+
 to Move_Forward
-  ask player[
+  ask player
+  [
     fd 2
   ]
 end
 
 to Turn_Left
-  ask player[
+  ask player
+  [
     lt 90
   ]
 end
 to Turn_Right
-  ask player[
+  ask player
+  [
     rt 90
   ]
  
@@ -41,7 +113,8 @@ end
 
 
 to Backwards
-  ask player[
+  ask player
+  [
     bk 2
   ]
 end
@@ -148,6 +221,57 @@ BUTTON
 244
 NIL
 Backwards
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+887
+137
+979
+170
+persuetest
+persue-button
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
+
+BUTTON
+889
+220
+977
+253
+attacktest
+attack-button
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+906
+96
+992
+129
+patroltest
+patrol-button
 NIL
 1
 T
