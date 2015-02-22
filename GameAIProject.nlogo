@@ -19,11 +19,16 @@ to setup-player
     setxy 10 10
     facexy 10 0
   ]
+  
+end
+
+to go
+
 end
 
 to Move_Forward
   ask player[
-    fd 2
+    fd 1
   ]
 end
 
@@ -42,7 +47,7 @@ end
 
 to Backwards
   ask player[
-    bk 2
+    bk 0.5
   ]
 end
 @#$#@#$#@
@@ -74,10 +79,10 @@ ticks
 30.0
 
 BUTTON
-104
-86
-168
-119
+62
+74
+126
+107
 Setup
 Setup
 NIL
@@ -91,10 +96,10 @@ NIL
 1
 
 BUTTON
-98
-149
-176
-182
+100
+169
+178
+202
 Forward
 Move_Forward
 NIL
@@ -102,16 +107,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+W
 NIL
 NIL
 1
 
 BUTTON
-3
-150
-69
-183
+27
+211
+93
+244
 Turn Left
 Turn_Left
 NIL
@@ -119,16 +124,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+A
 NIL
 NIL
 1
 
 BUTTON
-197
-151
-275
-184
+179
+211
+257
+244
 Turn Right
 Turn_Right
 NIL
@@ -136,7 +141,7 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+D
 NIL
 NIL
 1
@@ -153,10 +158,27 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+S
 NIL
 NIL
 1
+
+BUTTON
+150
+75
+213
+108
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -501,7 +523,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
+NetLogo 5.2-RC3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
