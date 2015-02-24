@@ -10,6 +10,12 @@ to setup-patches
   ask patches [ set pcolor grey]
 end
 
+to go
+  path
+  boundaries
+end
+
+  
 to setup-player
   set-default-shape player "arrow"
   create-Player 1
@@ -19,16 +25,29 @@ to setup-player
     setxy 10 10
     facexy 10 0
   ]
-  
 end
 
-to go
+to path
+  ask player [
+    if pcolor = grey
+    [
+      set pcolor black
+    ]
+  ]
+end
 
+to boundaries
+  ask player[
+  if xcor >= 16
+  [
+   stop
+   ]
+  ]
 end
 
 to Move_Forward
   ask player[
-    fd 1
+    fd 2
   ]
 end
 
@@ -47,7 +66,7 @@ end
 
 to Backwards
   ask player[
-    bk 0.5
+    bk 2
   ]
 end
 @#$#@#$#@
