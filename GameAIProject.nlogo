@@ -1,15 +1,26 @@
 breed [player player1]
+breed [enemies enemy]
+breed [jake jake1]
 
 to setup
 clear-all
 setup-patches
 setup-player
+setup-enemies
 reset-ticks
 end
+
 to setup-patches
-  ask patches [ set pcolor grey]
+  ask patches 
+  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
 end
 
+to go
+  path
+  boundaries
+end
+
+  
 to setup-player
   set-default-shape player "arrow"
   create-Player 1
@@ -17,24 +28,81 @@ to setup-player
     set color blue
     set size 1.5
     setxy 10 10
-    facexy 10 0
+    set heading 180
+  ]
+end
+
+to setup-enemies
+  set-default-shape enemies "person"
+  create-enemies 10
+  [
+    set color red
+    set size 1.5
+    ask enemies [ setxy random-xcor random-ycor ]
+  ]
+end
+
+to path
+  ask player [
+    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    [
+      set pcolor black
+    ]
+  ]
+end
+
+to boundaries
+  ask player[
+  if xcor >= 16
+  [
+   stop
+   ]
   ]
 end
 
 to Move_Forward
-  ask player[
+  ask player 
+  [
+    
+    set heading 0
+    if pycor != max-pycor
+    [
     fd 2
+    ]
+   ;; if  pycor != min-pycor
+   ;; [
+   ;;  fd 2
+    ;;]
+    
+   ;; if pycor = min-pycor 
+   ;; [
+    ;;  if heading != 180
+   ;;   [
+    ;;    fd 2]
+   ;; ]
   ]
+  
+  
+  
 end
 
 to Turn_Left
   ask player[
-    lt 90
+    
+    set heading 270
+    if pxcor != min-pxcor
+    [
+    fd 2
+    ]
   ]
 end
 to Turn_Right
   ask player[
-    rt 90
+    set heading 90
+    if pxcor != max-pxcor
+    [
+    fd 2
+    ]
   ]
  
 end
@@ -42,7 +110,11 @@ end
 
 to Backwards
   ask player[
-    bk 2
+    set heading 180
+    if pycor != min-pycor
+    [
+    fd 2
+    ]
   ]
 end
 @#$#@#$#@
@@ -74,10 +146,10 @@ ticks
 30.0
 
 BUTTON
-104
-86
-168
-119
+62
+74
+126
+107
 Setup
 Setup
 NIL
@@ -91,10 +163,10 @@ NIL
 1
 
 BUTTON
-98
-149
-176
-182
+100
+169
+178
+202
 Forward
 Move_Forward
 NIL
@@ -102,16 +174,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+W
 NIL
 NIL
 1
 
 BUTTON
-3
-150
-69
-183
+27
+211
+93
+244
 Turn Left
 Turn_Left
 NIL
@@ -119,16 +191,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+A
 NIL
 NIL
 1
 
 BUTTON
-197
-151
-275
-184
+179
+211
+257
+244
 Turn Right
 Turn_Right
 NIL
@@ -136,7 +208,7 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+D
 NIL
 NIL
 1
@@ -153,10 +225,27 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+S
 NIL
 NIL
 1
+
+BUTTON
+150
+75
+213
+108
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
