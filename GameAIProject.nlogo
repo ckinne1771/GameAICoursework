@@ -17,7 +17,6 @@ end
 
 to go
   path
-  boundaries
 end
 
   
@@ -40,6 +39,11 @@ to setup-enemies
     set size 1.5
     ask enemies [ setxy random-xcor random-ycor ]
   ]
+  ask enemies 
+  [ if any? player-here with [shape = "arrow"]
+    [set color green]
+   ;;[die]
+  ]
 end
 
 to path
@@ -48,15 +52,6 @@ to path
     [
       set pcolor black
     ]
-  ]
-end
-
-to boundaries
-  ask player[
-  if xcor >= 16
-  [
-   stop
-   ]
   ]
 end
 
@@ -590,7 +585,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
+NetLogo 5.2-RC3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
