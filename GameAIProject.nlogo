@@ -6,8 +6,10 @@ setup-patches
 setup-player
 reset-ticks
 end
+
 to setup-patches
-  ask patches [ set pcolor grey]
+  ask patches 
+  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
 end
 
 to go
@@ -29,7 +31,7 @@ end
 
 to path
   ask player [
-    if pcolor = grey
+    if pcolor = scale-color grey
     [
       set pcolor black
     ]
