@@ -95,6 +95,7 @@ to Move_Forward
   [
     fd 2
   ]
+  
 end
 
 to Turn_Left
@@ -173,7 +174,7 @@ Move_Forward
 NIL
 1
 T
-OBSERVER
+TURTLE
 NIL
 NIL
 NIL
