@@ -28,7 +28,7 @@ to setup-player
     set color blue
     set size 1.5
     setxy 10 10
-    facexy 10 0
+    set heading 180
   ]
 end
 
@@ -61,19 +61,48 @@ to boundaries
 end
 
 to Move_Forward
-  ask player[
+  ask player 
+  [
+    
+    set heading 0
+    if pycor != max-pycor
+    [
     fd 2
+    ]
+   ;; if  pycor != min-pycor
+   ;; [
+   ;;  fd 2
+    ;;]
+    
+   ;; if pycor = min-pycor 
+   ;; [
+    ;;  if heading != 180
+   ;;   [
+    ;;    fd 2]
+   ;; ]
   ]
+  
+  
+  
 end
 
 to Turn_Left
   ask player[
-    lt 90
+    
+    set heading 270
+    if pxcor != min-pxcor
+    [
+    fd 2
+    ]
   ]
 end
 to Turn_Right
   ask player[
-    rt 90
+    set heading 90
+    if pxcor != max-pxcor
+    [
+    fd 2
+    ]
   ]
  
 end
@@ -81,7 +110,11 @@ end
 
 to Backwards
   ask player[
-    bk 2
+    set heading 180
+    if pycor != min-pycor
+    [
+    fd 2
+    ]
   ]
 end
 @#$#@#$#@
@@ -557,7 +590,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2-RC3
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
