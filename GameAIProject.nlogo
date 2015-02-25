@@ -1,9 +1,12 @@
 breed [player player1]
+breed [enemies enemy]
+breed [jake jake1]
 
 to setup
 clear-all
 setup-patches
 setup-player
+setup-enemies
 reset-ticks
 end
 
@@ -29,9 +32,19 @@ to setup-player
   ]
 end
 
+to setup-enemies
+  set-default-shape enemies "person"
+  create-enemies 10
+  [
+    set color red
+    set size 1.5
+    ask enemies [ setxy random-xcor random-ycor ]
+  ]
+end
+
 to path
   ask player [
-    if pcolor = scale-color grey
+    if pcolor = scale-color grey ((random 500) + 5000)0 9000
     [
       set pcolor black
     ]
