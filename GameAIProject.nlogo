@@ -41,6 +41,7 @@ to setup-enemies
   ]
   ask enemies 
   [ if any? player-here with [shape = "arrow"]
+    ;;Ive set this to turn the turtle green rather than death for debugging
     [set color green]
    ;;[die]
   ]
