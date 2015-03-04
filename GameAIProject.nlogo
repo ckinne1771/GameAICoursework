@@ -1,6 +1,10 @@
+extensions [array]
+
 breed [player player1]
 breed [enemies enemy]
 breed [jake jake1]
+
+enemies-own [index headings]
 
 to setup
 clear-all
@@ -81,6 +85,24 @@ to Move_Forward
     ;;    fd 2]
    ;; ]
   ]
+  
+  ask enemies
+  [
+    ;;set headings [0 90 180 270]
+    ;;set index random 3
+    ;;let h item headings index
+    ;;set heading h
+    ;;fd 2
+  
+    
+    let headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+    ]
+
   
   
   
