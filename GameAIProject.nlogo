@@ -2,6 +2,11 @@ breed [player player1]
 breed [enemies enemy]
 breed [jake jake1]
 
+patches-own 
+[
+  playerSurrounding
+]
+
 to setup
 clear-all
 setup-patches
@@ -11,6 +16,7 @@ reset-ticks
 end
 
 to setup-patches
+  ask patches [set playerSurrounding "false"]
   ask patches 
   [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
 end
@@ -40,19 +46,29 @@ to setup-enemies
     ask enemies [ setxy random-xcor random-ycor ]
   ]
   ask enemies 
-  [ if any? player-here with [shape = "arrow"]
+  [ ;;if any? player-here
     ;;Ive set this to turn the turtle green rather than death for debugging
-    [set color green]
+    ;;[set color green]
    ;;[die]
+   ask neighbors [  
+   if playerSurrounding = "true"
+   [
+     
+     set pcolor green
+     ]
   ]
+  ]
+
 end
 
 to path
   ask player [
-    if pcolor = scale-color grey ((random 500) + 5000)0 9000
-    [
-      set pcolor black
-    ]
+    ;;if pcolor = scale-color grey ((random 500) + 5000)0 9000
+   ;; [
+    ;;  set pcolor black
+    ;;]
+    
+    ask neighbors [ set playerSurrounding "true" ]
   ]
 end
 
