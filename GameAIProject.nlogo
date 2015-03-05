@@ -3,11 +3,13 @@ breed [enemy enemy1]
 enemy-own 
 [
   state
+  health
 ]
 
 player-own
 [
   level
+  health
 ]
 
 
@@ -17,6 +19,7 @@ setup-patches
 setup-player
 setup-enemy
 ask enemy [set state "patrol"]
+ask enemy [set health 2]
 patrol-state
 reset-ticks
 end
@@ -93,7 +96,21 @@ end
 to Move_Forward
   ask player
   [
-    fd 2
+    if not any? other turtles-on patch-ahead 1
+    [
+    fd 1
+    ]
+    
+    if any? other turtles-on patch-ahead 3
+    [
+      ask enemy [set state "persue"]
+    ]
+    
+    if any? other turtles-on patch-ahead 1
+     [
+        ask enemy [set health health - 1 ]
+     ]
+    
   ]
   
 end
@@ -116,7 +133,10 @@ end
 to Backwards
   ask player
   [
+    if not any? other turtles-on patch-ahead 1
+    [
     bk 2
+    ]
   ]
 end
 @#$#@#$#@
