@@ -159,12 +159,11 @@ to Backwards
        ask enemies
   [
        
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
+    ;;set headings array:from-list  [0 90 180 270]
+    ;;set index random 3
+   ;; let h array:item headings index
+    set heading towards Player1 0
+     fd 2
   ]
 end
 @#$#@#$#@
