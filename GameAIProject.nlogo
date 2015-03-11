@@ -88,14 +88,8 @@ to Move_Forward
   
   ask enemies
   [
-    ;;set headings [0 90 180 270]
-    ;;set index random 3
-    ;;let h item headings index
-    ;;set heading h
-    ;;fd 2
-  
-    
-    let headings array:from-list  [0 90 180 270]
+       
+    set headings array:from-list  [0 90 180 270]
     set index random 3
     let h array:item headings index
     set heading h
@@ -116,6 +110,20 @@ to Turn_Left
     [
     fd 2
     ]
+    
+
+    ]
+    
+  
+     ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
   ]
 end
 to Turn_Right
@@ -125,6 +133,16 @@ to Turn_Right
     [
     fd 2
     ]
+  ]
+       ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
   ]
  
 end
@@ -137,6 +155,16 @@ to Backwards
     [
     fd 2
     ]
+  ]
+       ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
   ]
 end
 @#$#@#$#@
