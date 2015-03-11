@@ -1,4 +1,7 @@
+extensions [array]
+
 breed [player player1]
+<<<<<<< HEAD
 breed [enemy enemy1]
 enemy-own 
 [
@@ -12,21 +15,39 @@ player-own
   health
 ]
 
+=======
+breed [enemies enemy]
+breed [jake jake1]
+
+enemies-own [index headings]
+>>>>>>> origin/Chris-Branch
 
 to setup
 clear-all
 setup-patches
 setup-player
+<<<<<<< HEAD
 setup-enemy
 ask enemy [set state "patrol"]
 ask enemy [set health 2]
 patrol-state
+=======
+setup-enemies
+>>>>>>> origin/Chris-Branch
 reset-ticks
 end
+
 to setup-patches
-  ask patches [ set pcolor grey]
+  ask patches 
+  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
 end
 
+to go
+  path
+  boundaries
+end
+
+  
 to setup-player
   set-default-shape player "arrow"
   create-Player 1
@@ -34,10 +55,11 @@ to setup-player
     set color blue
     set size 1.5
     setxy 10 10
-    facexy 10 0
+    set heading 180
   ]
 end
 
+<<<<<<< HEAD
 to setup-enemy
   set-default-shape enemy "arrow"
   create-Enemy 1
@@ -125,18 +147,146 @@ to Turn_Right
   ask player
   [
     rt 90
+=======
+to setup-enemies
+  set-default-shape enemies "person"
+  create-enemies 10
+  [
+    set color red
+    set size 1.5
+    ask enemies [ setxy random-xcor random-ycor ]
+  ]
+end
+
+to path
+  ask player [
+    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    [
+      set pcolor black
+    ]
+  ]
+end
+
+to boundaries
+  ask player[
+  if xcor >= 16
+  [
+   stop
+   ]
+  ]
+end
+
+to Move_Forward
+  ask player 
+  [
+    
+    set heading 0
+    if pycor != max-pycor
+    [
+    fd 2
+    ]
+   ;; if  pycor != min-pycor
+   ;; [
+   ;;  fd 2
+    ;;]
+    
+   ;; if pycor = min-pycor 
+   ;; [
+    ;;  if heading != 180
+   ;;   [
+    ;;    fd 2]
+   ;; ]
+  ]
+  
+  ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+    ]
+
+  
+  
+  
+end
+
+to Turn_Left
+  ask player[
+    
+    set heading 270
+    if pxcor != min-pxcor
+    [
+    fd 2
+    ]
+    
+
+    ]
+    
+  
+     ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+  ]
+end
+to Turn_Right
+  ask player[
+    set heading 90
+    if pxcor != max-pxcor
+    [
+    fd 2
+    ]
+  ]
+       ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+>>>>>>> origin/Chris-Branch
   ]
  
 end
 
 
 to Backwards
+<<<<<<< HEAD
   ask player
   [
     if not any? other turtles-on patch-ahead 1
     [
     bk 2
     ]
+=======
+  ask player[
+    set heading 180
+    if pycor != min-pycor
+    [
+    fd 2
+    ]
+  ]
+       ask enemies
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+>>>>>>> origin/Chris-Branch
   ]
 end
 @#$#@#$#@
@@ -168,10 +318,10 @@ ticks
 30.0
 
 BUTTON
-104
-86
-168
-119
+62
+74
+126
+107
 Setup
 Setup
 NIL
@@ -185,10 +335,10 @@ NIL
 1
 
 BUTTON
-98
-149
-176
-182
+100
+169
+178
+202
 Forward
 Move_Forward
 NIL
@@ -196,16 +346,16 @@ NIL
 T
 TURTLE
 NIL
-NIL
+W
 NIL
 NIL
 1
 
 BUTTON
-3
-150
-69
-183
+27
+211
+93
+244
 Turn Left
 Turn_Left
 NIL
@@ -213,16 +363,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+A
 NIL
 NIL
 1
 
 BUTTON
-197
-151
-275
-184
+179
+211
+257
+244
 Turn Right
 Turn_Right
 NIL
@@ -230,7 +380,7 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+D
 NIL
 NIL
 1
@@ -247,10 +397,27 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+S
 NIL
 NIL
 1
+
+BUTTON
+150
+75
+213
+108
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 BUTTON
 887
