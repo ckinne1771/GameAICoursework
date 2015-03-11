@@ -38,7 +38,6 @@ end
 to go
   path
   boundaries
-  enemypath
 end
 
   
@@ -118,15 +117,6 @@ to path
   ]
 end
 
-to enemypath
-  ask enemy[
-    if pcolor = scale-color grey ((random 500) + 5000)0 9000
-    [
-      set pcolor red
-    ]
-  ]
-end
-
 to boundaries
   ask player
   [
@@ -163,10 +153,10 @@ to Move_Forward
     set headings array:from-list  [0 90 180 270]
     set index random 3
     let h array:item headings index
-    set heading h
+    set heading towards Player1 0
+    
    
-    fd 2
-    enemypath
+    fd 1
     ]
   
 end
@@ -189,7 +179,7 @@ to Turn_Left
     let h array:item headings index
     set heading h
    
-    fd 2
+    fd 1
   ]
     ;; if  pycor != min-pycor
    ;; [
@@ -225,7 +215,7 @@ to Turn_Right
     let h array:item headings index
     set heading h
    
-    fd 2
+    fd 1
   ]
   
 end
@@ -247,7 +237,7 @@ to Backwards
     let h array:item headings index
     set heading h
    
-    fd 2
+    fd 1
   ]
   
 end
