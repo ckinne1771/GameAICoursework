@@ -1,12 +1,15 @@
 extensions [array]
 
 breed [player player1]
-<<<<<<< HEAD
 breed [enemy enemy1]
+breed [jake jake1]
+
 enemy-own 
 [
   state
   health
+  index
+  headings
 ]
 
 player-own
@@ -15,25 +18,15 @@ player-own
   health
 ]
 
-=======
-breed [enemies enemy]
-breed [jake jake1]
-
-enemies-own [index headings]
->>>>>>> origin/Chris-Branch
 
 to setup
 clear-all
 setup-patches
 setup-player
-<<<<<<< HEAD
 setup-enemy
 ask enemy [set state "patrol"]
 ask enemy [set health 2]
 patrol-state
-=======
-setup-enemies
->>>>>>> origin/Chris-Branch
 reset-ticks
 end
 
@@ -45,6 +38,7 @@ end
 to go
   path
   boundaries
+  enemypath
 end
 
   
@@ -59,15 +53,15 @@ to setup-player
   ]
 end
 
-<<<<<<< HEAD
+
 to setup-enemy
-  set-default-shape enemy "arrow"
-  create-Enemy 1
+  set-default-shape enemy "person"
+  create-Enemy 5
   [
     set color red
     set size 1.5
-    setxy 10 20
-    facexy 10 0
+    ask enemy [ setxy random-xcor random-ycor ]
+    
   ]
 end
 
@@ -115,12 +109,42 @@ to attack-state
     
 end
 
-to Move_Forward
+to path
+  ask player [
+    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    [
+      set pcolor black
+    ]
+  ]
+end
+
+to enemypath
+  ask enemy[
+    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    [
+      set pcolor red
+    ]
+  ]
+end
+
+to boundaries
   ask player
   [
-    if not any? other turtles-on patch-ahead 1
+    if xcor >= 16
     [
-    fd 1
+      stop
+    ]
+  ]
+end
+
+to Move_Forward
+   set heading 0
+    if pycor != max-pycor
+    [
+      if not any? other turtles-on patch-ahead 1
+      [
+        fd 2
+      ]
     ]
     
     if any? other turtles-on patch-ahead 3
@@ -132,60 +156,42 @@ to Move_Forward
      [
         ask enemy [set health health - 1 ]
      ]
-    
-  ]
+     
+   ask enemy
+   [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+    enemypath
+    ]
   
 end
 
 to Turn_Left
-  ask player
-  [
-    lt 90
-  ]
-end
-to Turn_Right
-  ask player
-  [
-    rt 90
-=======
-to setup-enemies
-  set-default-shape enemies "person"
-  create-enemies 10
-  [
-    set color red
-    set size 1.5
-    ask enemies [ setxy random-xcor random-ycor ]
-  ]
-end
-
-to path
-  ask player [
-    if pcolor = scale-color grey ((random 500) + 5000)0 9000
-    [
-      set pcolor black
-    ]
-  ]
-end
-
-to boundaries
-  ask player[
-  if xcor >= 16
-  [
-   stop
-   ]
-  ]
-end
-
-to Move_Forward
-  ask player 
-  [
+    ask player
+[
     
-    set heading 0
-    if pycor != max-pycor
+    set heading 270
+    if pxcor != min-pxcor
     [
     fd 2
     ]
-   ;; if  pycor != min-pycor
+     
+     ask enemy
+  [
+       
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 2
+  ]
+    ;; if  pycor != min-pycor
    ;; [
    ;;  fd 2
     ;;]
@@ -194,59 +200,24 @@ to Move_Forward
    ;; [
     ;;  if heading != 180
    ;;   [
-    ;;    fd 2]
+    ;;    fd 2
+       ;; ]
    ;; ]
-  ]
-  
-  ask enemies
-  [
-       
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
-    ]
 
-  
-  
+]
   
 end
 
-to Turn_Left
-  ask player[
-    
-    set heading 270
-    if pxcor != min-pxcor
-    [
-    fd 2
-    ]
-    
-
-    ]
-    
-  
-     ask enemies
-  [
-       
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
-  ]
-end
 to Turn_Right
-  ask player[
+  ask player
+[
     set heading 90
     if pxcor != max-pxcor
     [
     fd 2
     ]
-  ]
-       ask enemies
+]
+     ask enemy
   [
        
     set headings array:from-list  [0 90 180 270]
@@ -255,29 +226,20 @@ to Turn_Right
     set heading h
    
     fd 2
->>>>>>> origin/Chris-Branch
   ]
- 
+  
 end
 
-
 to Backwards
-<<<<<<< HEAD
   ask player
   [
-    if not any? other turtles-on patch-ahead 1
-    [
-    bk 2
-    ]
-=======
-  ask player[
     set heading 180
     if pycor != min-pycor
     [
     fd 2
     ]
   ]
-       ask enemies
+       ask enemy
   [
        
     set headings array:from-list  [0 90 180 270]
@@ -286,8 +248,8 @@ to Backwards
     set heading h
    
     fd 2
->>>>>>> origin/Chris-Branch
   ]
+  
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
