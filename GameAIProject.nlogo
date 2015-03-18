@@ -1,6 +1,9 @@
 breed [player player1]
 breed [enemies enemy]
 breed [jake jake1]
+breed [rooms room]
+
+globals [ time-elapsed ]
 
 patches-own 
 [
@@ -10,8 +13,12 @@ patches-own
 to setup
 clear-all
 setup-patches
+setup-rooms
 setup-player
 setup-enemies
+setup-timer
+;;keep-count
+;;update-timer-display
 reset-ticks
 end
 
@@ -23,9 +30,20 @@ end
 
 to go
   path
+  check-patches
+  keep-count
+update-timer-display
 end
 
-  
+to setup-rooms
+  set-default-shape rooms "box" 
+  ;;ask patch random-xcor random-ycor [ set pcolor green ]
+  create-rooms 5
+  [
+    setxy random-xcor random-ycor
+    set size 5
+    ]
+end
 to setup-player
   set-default-shape player "arrow"
   create-Player 1
@@ -35,6 +53,10 @@ to setup-player
     setxy 10 10
     set heading 180
   ]
+  ;;ask player
+  ;;[ 
+ ;; ask neighbors [set pcolor yellow]
+ ;; ]
 end
 
 to setup-enemies
@@ -61,15 +83,47 @@ to setup-enemies
 
 end
 
+to setup-timer
+    set time-elapsed 30 
+    
+   ask patch max-pxcor max-pycor
+   [ set plabel-color white 
+     set plabel time-elapsed
+   ]
+   
+end
+
+to keep-count
+  set time-elapsed time-elapsed + 1
+end
+
+to update-timer-display
+   ask patch max-pxcor max-pycor [ set plabel time-elapsed ]
+end
+
 to path
   ask player [
+    if neighbors = any? enemies-here
+    [
+      set playerSurrounding "true" 
+    ]
     ;;if pcolor = scale-color grey ((random 500) + 5000)0 9000
    ;; [
     ;;  set pcolor black
     ;;]
     
-    ask neighbors [ set playerSurrounding "true" ]
+    ask player
+  [ 
+  ask neighbors [set pcolor yellow]
   ]
+    
+    ;;ask neighbors [ set playerSurrounding "true" ]
+    
+  ]
+end
+
+to check-patches
+  
 end
 
 to Move_Forward
