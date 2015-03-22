@@ -15,6 +15,7 @@ player-own
 [
   level
   health
+  headings
 ]
 
 to setup
@@ -37,7 +38,7 @@ to setup-player
   create-Player 1
   [
     set color blue
-    set size 1.5
+    set size 1
     setxy 10 10
     set heading 180
   ]
@@ -45,11 +46,13 @@ end
  
 to setup-enemy
   set-default-shape enemy "person"
-  create-Enemy 5
+  create-Enemy 2
   [
     set color red
     set size 1.5
     ask enemy [ setxy random-xcor random-ycor ]
+    set health 3
+    set state "patrol"
     
   ]
 end
@@ -80,6 +83,32 @@ to boundaries
   
 end
 
+to Kombat
+  if any? other turtles-on patch-ahead 1
+     [
+        ask enemy-on patch-ahead 1
+        [
+          set state "combat"
+          set health health - 1
+          if health <= 0
+          [
+            die
+          ]
+        ]  
+     
+      ]
+  
+end
+
+to StateMachine
+  if state = "patrol"
+  [
+    
+  ]
+  
+end
+
+
 to Move_Forward
   
    playerForward
@@ -89,12 +118,20 @@ end
 
 to playerForward
   
+  
   ask player
   [
-    fd 1    
+    set heading 0
+    if pxcor != max-pxcor
+    [
+      if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      kombat
+   ]
+    
   ]
-  
-  
   
 end
 
@@ -107,7 +144,18 @@ end
 
 to playerBackwards
   
-  
+   ask player
+  [
+    set heading 180
+    if pycor != min-pycor
+    [
+    if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      kombat
+    ]
+  ]
   
 end
 
@@ -120,7 +168,19 @@ end
 
 to playerLeft
   
-  
+  ask player
+  [
+    set heading 270
+    if pycor != min-pycor
+    [
+    if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      kombat
+      
+   ]
+  ]
   
 end
 
@@ -133,7 +193,18 @@ end
 
 to playerRight
   
-  
+  ask player
+  [
+    set heading 90
+    if pycor != min-pycor
+    [
+    if not any? enemy-on patch-ahead 1
+      [
+        fd 1
+      ]
+      kombat
+    ]
+  ]
   
 end
 
@@ -146,12 +217,12 @@ to enemyMove
     let h array:item headings index
     set heading h
     fd 1
-    
+  
+  
   ]
   
   
 end
-
 
 
 
@@ -213,7 +284,7 @@ Move_Forward
 NIL
 1
 T
-TURTLE
+OBSERVER
 NIL
 W
 NIL
@@ -287,57 +358,6 @@ NIL
 NIL
 NIL
 0
-
-BUTTON
-887
-137
-979
-170
-persuetest
-persue-button
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-0
-
-BUTTON
-889
-220
-977
-253
-attacktest
-attack-button
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-906
-96
-992
-129
-patroltest
-patrol-button
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
