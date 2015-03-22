@@ -2,7 +2,6 @@ extensions [array]
 
 breed [player player1]
 breed [enemy enemy1]
-breed [jake jake1]
 
 enemy-own 
 [
@@ -18,29 +17,21 @@ player-own
   health
 ]
 
-
 to setup
 clear-all
 setup-patches
 setup-player
 setup-enemy
-ask enemy [set state "patrol"]
-ask enemy [set health 2]
-patrol-state
 reset-ticks
 end
 
 to setup-patches
   ask patches 
-  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
+  [ 
+    set pcolor scale-color grey ((random 500) + 5000)0 9000
+  ]
 end
 
-to go
-  path
-  boundaries
-end
-
-  
 to setup-player
   set-default-shape player "arrow"
   create-Player 1
@@ -51,8 +42,7 @@ to setup-player
     set heading 180
   ]
 end
-
-
+ 
 to setup-enemy
   set-default-shape enemy "person"
   create-Enemy 5
@@ -64,52 +54,14 @@ to setup-enemy
   ]
 end
 
-to patrol-button
-  ask enemy [set state "patrol"]
-  patrol-state
-  ask enemy [print state]
-end
-
-to patrol-state
-    ask enemy
-    [
-      if state = "persue"
-      [
-        persue-state
-      ]
-      
-    ]
-end
-
-to persue-button
-  ask enemy [set state "persue"]
-  persue-state
-  ask enemy [print state]
-end
-
-to persue-state
-    ask enemy
-    [
-      if state = "attack"
-      [
-        attack-state
-      ]
-      
-    ]
-end
-
-to attack-button
-  ask enemy [set state "attack"]
-  attack-state
-  ask enemy [print state]
-end
-
-to attack-state
-    
+to go
+  path
+  boundaries
 end
 
 to path
-  ask player [
+  ask player 
+  [
     if pcolor = scale-color grey ((random 500) + 5000)0 9000
     [
       set pcolor black
@@ -118,129 +70,94 @@ to path
 end
 
 to boundaries
-  ask player
+   ask player
   [
     if xcor >= 16
     [
       stop
     ]
   ]
+  
 end
 
 to Move_Forward
-   set heading 0
-    if pycor != max-pycor
-    [
-      if not any? other turtles-on patch-ahead 1
-      [
-        fd 2
-      ]
-    ]
-    
-    if any? other turtles-on patch-ahead 3
-    [
-      ask enemy [set state "persue"]
-    ]
-    
-    if any? other turtles-on patch-ahead 1
-     [
-        ask enemy [set health health - 1 ]
-     ]
-     
-   ask enemy
-   [
-       
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading towards Player1 0
-    
-   
-    fd 1
-    ]
+  
+   playerForward
+   enemyMove
   
 end
 
-to Turn_Left
-    ask player
-[
-    
-    set heading 270
-    if pxcor != min-pxcor
-    [
-    fd 2
-    ]
-     
-     ask enemy
-  [
-       
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 1
-  ]
-    ;; if  pycor != min-pycor
-   ;; [
-   ;;  fd 2
-    ;;]
-    
-   ;; if pycor = min-pycor 
-   ;; [
-    ;;  if heading != 180
-   ;;   [
-    ;;    fd 2
-       ;; ]
-   ;; ]
-
-]
+to playerForward
   
-end
-
-to Turn_Right
   ask player
-[
-    set heading 90
-    if pxcor != max-pxcor
-    [
-    fd 2
-    ]
-]
-     ask enemy
   [
-       
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 1
+    fd 1    
   ]
+  
+  
   
 end
 
 to Backwards
-  ask player
-  [
-    set heading 180
-    if pycor != min-pycor
-    [
-    fd 2
-    ]
-  ]
-       ask enemy
+  
+  playerBackwards
+  enemyMove
+  
+end
+
+to playerBackwards
+  
+  
+  
+end
+
+to turn_left
+  
+  playerLeft
+  enemyMove
+  
+end
+
+to playerLeft
+  
+  
+  
+end
+
+to turn_right
+  
+  playerRight
+  enemyMove
+  
+end
+
+to playerRight
+  
+  
+  
+end
+
+to enemyMove
+  ask enemy
   [
        
     set headings array:from-list  [0 90 180 270]
     set index random 3
     let h array:item headings index
     set heading h
-   
     fd 1
+    
   ]
   
+  
 end
+
+
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 315
