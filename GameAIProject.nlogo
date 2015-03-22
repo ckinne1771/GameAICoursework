@@ -122,14 +122,14 @@ to playerForward
   ask player
   [
     set heading 0
-    if pxcor != max-pxcor
+    if pxcor != min-pxcor
     [
       if not any? other turtles-on patch-ahead 1
       [
         fd 1
       ]
       kombat
-   ]
+    ]
     
   ]
   
@@ -149,7 +149,7 @@ to playerBackwards
     set heading 180
     if pycor != min-pycor
     [
-    if not any? other turtles-on patch-ahead 1
+      if not any? other turtles-on patch-ahead 1
       [
         fd 1
       ]
@@ -217,13 +217,28 @@ to enemyMove
     let h array:item headings index
     set heading h
     fd 1
-  
-  
+    
+    if any? player in-radius 3
+    [
+     
+      ask enemy-here [set state "persue"]
+      ask enemy-here[set heading towards Player1 0]
+      ask enemy-here[print state]
+      
+    ]
+    if any? player in-radius 1
+    [
+    
+      
+      ask enemy-here [set state "combat"]
+      ask enemy-here[set heading towards Player1 0]
+      ask enemy-here[print state]
+    ]
   ]
   
   
+  
 end
-
 
 
 
