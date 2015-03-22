@@ -4,6 +4,8 @@ breed [player player1]
 breed [enemies enemy]
 breed [jake jake1]
 
+globals [playerCorX playerCorY]
+
 enemies-own [index headings]
 
 to setup
@@ -46,6 +48,8 @@ to setup-enemies
   ]
 end
 
+
+
 to path
   ask player [
     if pcolor = scale-color grey ((random 500) + 5000)0 9000
@@ -64,6 +68,7 @@ to boundaries
   ]
 end
 
+
 to Move_Forward
   ask player 
   [
@@ -72,6 +77,7 @@ to Move_Forward
     if pycor != max-pycor
     [
     fd 2
+    set playerCorY pycor
     ]
    ;; if  pycor != min-pycor
    ;; [
@@ -89,12 +95,38 @@ to Move_Forward
   ask enemies
   [
        
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
+    ifelse playerCorY < pycor
+   [
+    set heading 180
+    
+     fd 2
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 2
+     ]
+     [
+       ifelse  playerCorX > pycor
+         [
+           set heading 90
+    
+           fd 2
+         ]
+         [
+           ifelse playerCorX < pycor
+             [
+               set heading 180
+    
+               fd 2
+             ]
+             [
+               set heading 0
+             ]
+           ]
+           ]
+         ]
     ]
 
   
@@ -109,6 +141,7 @@ to Turn_Left
     if pxcor != min-pxcor
     [
     fd 2
+    set playerCorX pxcor
     ]
     
 
@@ -118,12 +151,38 @@ to Turn_Left
      ask enemies
   [
        
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
+    ifelse playerCorY < pycor
+   [
+    set heading 180
+    
+     fd 2
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 2
+     ]
+     [
+       ifelse  playerCorX > pycor
+         [
+           set heading 90
+    
+           fd 2
+         ]
+         [
+           ifelse playerCorX < pycor
+             [
+               set heading 180
+    
+               fd 2
+             ]
+             [
+               set heading 0
+             ]
+           ]
+           ]
+         ]
   ]
 end
 to Turn_Right
@@ -132,17 +191,44 @@ to Turn_Right
     if pxcor != max-pxcor
     [
     fd 2
+    set playerCorX pxcor
     ]
   ]
        ask enemies
   [
        
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 2
+     ifelse playerCorY < pycor
+   [
+    set heading 180
+    
+     fd 2
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 2
+     ]
+     [
+       ifelse  playerCorX > pycor
+         [
+           set heading 90
+    
+           fd 2
+         ]
+         [
+           ifelse playerCorX < pycor
+             [
+               set heading 180
+    
+               fd 2
+             ]
+             [
+               set heading 0
+             ]
+           ]
+           ]
+         ]
   ]
  
 end
@@ -154,6 +240,7 @@ to Backwards
     if pycor != min-pycor
     [
     fd 2
+    set playerCorY pycor
     ]
   ]
        ask enemies
@@ -162,10 +249,45 @@ to Backwards
     ;;set headings array:from-list  [0 90 180 270]
     ;;set index random 3
    ;; let h array:item headings index
-    set heading towards Player1 0
+   ifelse playerCorY < pycor
+   [
+    set heading 180
+    
      fd 2
-  ]
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 2
+     ]
+     [
+       ifelse  playerCorX > pycor
+         [
+           set heading 90
+    
+           fd 2
+         ]
+         [
+           ifelse playerCorX < pycor
+             [
+               set heading 180
+    
+               fd 2
+             ]
+             [
+               set heading 0
+             ]
+           ]
+           ]
+         ]
+       ]  
+   
+   
+   
 end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 315
