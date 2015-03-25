@@ -1,24 +1,61 @@
 extensions [array]
-
-breed [player player1]
-breed [enemies enemy]
-breed [jake jake1]
-
 globals [playerCorX playerCorY]
 
-enemies-own [index headings]
+breed [player player1]
+breed [enemy enemy1]
+
+enemy-own 
+[
+  state
+  health
+  index
+  headings
+]
+
+player-own
+[
+  level
+  health
+  headings
+]
 
 to setup
 clear-all
 setup-patches
 setup-player
-setup-enemies
+setup-enemy
 reset-ticks
 end
 
 to setup-patches
   ask patches 
-  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
+  [ 
+    set pcolor scale-color grey ((random 500) + 5000)0 9000
+  ]
+end
+
+to setup-player
+  set-default-shape player "arrow"
+  create-Player 1
+  [
+    set color blue
+    set size 1
+    setxy 10 10
+    set heading 180
+  ]
+end
+ 
+to setup-enemy
+  set-default-shape enemy "person"
+  create-Enemy 2
+  [
+    set color red
+    set size 1.5
+    ask enemy [ setxy random-xcor random-ycor ]
+    set health 3
+    set state "patrol"
+    
+  ]
 end
 
 to go
@@ -26,32 +63,9 @@ to go
   boundaries
 end
 
-  
-to setup-player
-  set-default-shape player "arrow"
-  create-Player 1
-  [
-    set color blue
-    set size 1.5
-    setxy 10 10
-    set heading 180
-  ]
-end
-
-to setup-enemies
-  set-default-shape enemies "person"
-  create-enemies 10
-  [
-    set color red
-    set size 1.5
-    ask enemies [ setxy random-xcor random-ycor ]
-  ]
-end
-
-
-
 to path
-  ask player [
+  ask player 
+  [
     if pcolor = scale-color grey ((random 500) + 5000)0 9000
     [
       set pcolor black
@@ -60,232 +74,206 @@ to path
 end
 
 to boundaries
-  ask player[
-  if xcor >= 16
+   ask player
   [
-   stop
-   ]
+    if xcor >= 16
+    [
+      stop
+    ]
   ]
+  
+end
+
+to Kombat
+  if any? other turtles-on patch-ahead 1
+     [
+        ask enemy-on patch-ahead 1
+        [
+          set state "combat"
+          set health health - 1
+          if health <= 0
+          [
+            die
+          ]
+        ]  
+     
+      ]
+  
+end
+
+to StateMachine
+  if state = "patrol"
+  [
+    
+  ]
+  
 end
 
 
 to Move_Forward
-  ask player 
-  [
-    
-    set heading 0
-    if pycor != max-pycor
-    [
-    fd 2
-    set playerCorY pycor
-    ]
-   ;; if  pycor != min-pycor
-   ;; [
-   ;;  fd 2
-    ;;]
-    
-   ;; if pycor = min-pycor 
-   ;; [
-    ;;  if heading != 180
-   ;;   [
-    ;;    fd 2]
-   ;; ]
-  ]
   
-  ask enemies
-  [
-       
-    ifelse playerCorY < pycor
-   [
-    set heading 180
-    
-     fd 2
-   ]
-   [ ifelse playerCorY > pycor
-     [
-       set heading 0
-    
-       fd 2
-     ]
-     [
-       ifelse  playerCorX > pycor
-         [
-           set heading 90
-    
-           fd 2
-         ]
-         [
-           ifelse playerCorX < pycor
-             [
-               set heading 180
-    
-               fd 2
-             ]
-             [
-               set heading 0
-             ]
-           ]
-           ]
-         ]
-    ]
-
-  
-  
+   playerForward
+   enemyMove
   
 end
 
-to Turn_Left
-  ask player[
-    
-    set heading 270
+to playerForward
+  
+  
+  ask player
+  [
+    set heading 0
     if pxcor != min-pxcor
     [
-    fd 2
-    set playerCorX pxcor
+      if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      set playerCorY pycor
+      kombat
     ]
     
-
-    ]
-    
+  ]
   
-     ask enemies
-  [
-       
-    ifelse playerCorY < pycor
-   [
-    set heading 180
-    
-     fd 2
-   ]
-   [ ifelse playerCorY > pycor
-     [
-       set heading 0
-    
-       fd 2
-     ]
-     [
-       ifelse  playerCorX > pycor
-         [
-           set heading 90
-    
-           fd 2
-         ]
-         [
-           ifelse playerCorX < pycor
-             [
-               set heading 180
-    
-               fd 2
-             ]
-             [
-               set heading 0
-             ]
-           ]
-           ]
-         ]
-  ]
 end
-to Turn_Right
-  ask player[
-    set heading 90
-    if pxcor != max-pxcor
-    [
-    fd 2
-    set playerCorX pxcor
-    ]
-  ]
-       ask enemies
-  [
-       
-     ifelse playerCorY < pycor
-   [
-    set heading 180
-    
-     fd 2
-   ]
-   [ ifelse playerCorY > pycor
-     [
-       set heading 0
-    
-       fd 2
-     ]
-     [
-       ifelse  playerCorX > pycor
-         [
-           set heading 90
-    
-           fd 2
-         ]
-         [
-           ifelse playerCorX < pycor
-             [
-               set heading 180
-    
-               fd 2
-             ]
-             [
-               set heading 0
-             ]
-           ]
-           ]
-         ]
-  ]
- 
-end
-
 
 to Backwards
-  ask player[
+  
+  playerBackwards
+  enemyMove
+  
+end
+
+to playerBackwards
+  
+   ask player
+  [
     set heading 180
     if pycor != min-pycor
     [
-    fd 2
-    set playerCorY pycor
+      if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      set playerCorY pycor
+      kombat
+      
     ]
   ]
-       ask enemies
+  
+end
+
+to turn_left
+  
+  playerLeft
+  enemyMove
+  
+end
+
+to playerLeft
+  
+  ask player
   [
+    set heading 270
+    if pycor != min-pycor
+    [
+    if not any? other turtles-on patch-ahead 1
+      [
+        fd 1
+      ]
+      set playerCorX pxcor
+      kombat
+      
+   ]
+  ]
+  
+end
+
+to turn_right
+  
+  playerRight
+  enemyMove
+  
+end
+
+to playerRight
+  
+  ask player
+  [
+    set heading 90
+    if pycor != min-pycor
+    [
+    if not any? enemy-on patch-ahead 1
+      [
+        fd 1
+      ]
+      set playerCorX pxcor
+      kombat
+    ]
+  ]
+  
+end
+
+to enemyMove
        
-    ;;set headings array:from-list  [0 90 180 270]
-    ;;set index random 3
-   ;; let h array:item headings index
-   ifelse playerCorY < pycor
+    ask enemy
+  [
+    ifelse playerCorY < pycor
    [
     set heading 180
     
-     fd 2
+     fd 1
    ]
    [ ifelse playerCorY > pycor
      [
        set heading 0
     
-       fd 2
+       fd 1
      ]
      [
-       ifelse  playerCorX > pycor
+       ifelse  playerCorX > pxcor
          [
            set heading 90
     
-           fd 2
+           fd 1
          ]
          [
-           ifelse playerCorX < pycor
+           ifelse playerCorX < pxcor
              [
-               set heading 180
+               set heading 270
     
-               fd 2
+               fd 1
              ]
              [
                set heading 0
              ]
-           ]
-           ]
-         ]
-       ]  
-   
-   
-   
+        ]
+     ]
+  ]
+    if any? player in-radius 3
+    [
+     
+      ask enemy-here [set state "persue"]
+      ask enemy-here[print state]
+      
+    ]
+    if any? player in-radius 1
+    [
+     
+      ask enemy-here [set state "combat"]
+      ask enemy-here[print state]
+    ]
+  ]
+  
+  
+    
+  
+  
+  
+  
+  
 end
+
 
 
 @#$#@#$#@
