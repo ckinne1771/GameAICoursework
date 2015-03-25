@@ -1,30 +1,93 @@
-breed [player player1]
-player-own [ new-heading ]
-breed [enemies enemy]
-breed [jake jake1]
-globals 
-[ 
-  time-elapsed 
-  level
-  tool
+turtles-own [ home-pos ]
+
+globals [
+  ;;difficulty    ;; Slider in Pac-Man.nlogo
+  level         ;; Current Level
+  ;;level-over?   ;; True when a level is complete
+  ;;dead?         ;; True when pacman is loses a life
+  tool          ;; The currently selected tool
 ]
 
-patches-own 
-[
-  playerSurrounding
-]
-
-to setup
-clear-all
-set level 1 
-load-map
-setup-player
-setup-enemies
-reset-ticks
+to setup 
+  if user-yes-or-no? "Do you want to clear current level?"
+  [
+    ca
+    ;;set difficulty 0
+    set level 0
+    ;;set level-over? false
+    ;;set dead? false
+    set tool "Clear"
+    
+    ask patches 
+  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
+    ]
 end
 
-to load-map  
-  ;; Filenames of Level Files
+to create
+  if mouse-down?
+  [
+    if tool = "Clear"
+    [ clear ]
+    
+    if tool = "Draw Wall"
+    [ draw-boundary black ]
+  ]
+end
+
+to clear
+  ask patch (round mouse-xcor) (round mouse-ycor)
+  [
+    set pcolor scale-color grey ((random 500) + 5000)0 9000
+  ]
+end
+
+to draw-boundary [ boundary-color ]
+  ask patch (round mouse-xcor) (round mouse-ycor)
+  [
+     set pcolor boundary-color 
+  ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Saving and Loading Procedures ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Change the Level
+to set-level
+  if level > 0
+  [
+    if not user-yes-or-no? "Are you sure you want to change the level number of this map?"
+    [ stop ]
+  ]
+  let temp 0
+  while[ temp <= 0 ]
+  [
+    set temp read-from-string user-input "Input New Level Number:"
+    if temp <= 0
+    [ user-message "The level must be a positive number." ]
+  ]
+  set level temp
+end
+
+
+to save-level
+  if level <= 0
+  [
+    user-message "You must choose a positive level number before saving."
+    set-level
+  ]
+  let filepath (word "../gamemap" level ".csv")
+  ifelse user-yes-or-no? (word "File will be saved at: " filepath
+     "\nIf this file already exists, it will be overwritten.\nAre you sure you want to save?")
+  [
+    export-world filepath
+    user-message "File Saved."
+  ]
+  [ user-message "Save Canceled. File not saved." ]
+end
+
+;; Load a level
+to load-level
   let choice 0
   while[ choice <= 0 ]
   [
@@ -38,109 +101,16 @@ to load-map
          "\nAre you sure you want to Load?")
   [
     import-world filepath
+    set tool "Eraser"
     user-message "File Loaded."
   ]
   [ user-message "Load Canceled. File not loaded." ]
 end
-
-to go
-  path
-  check-patches
-end
-
-to setup-player
-  set-default-shape player "arrow"
-  create-Player 1
-  [
-    set color blue
-    set size 1.5
-    setxy 10 10
-    set heading 180
-  ]
-end
-
-to setup-enemies
-  set-default-shape enemies "person"
-  create-enemies 10
-  [
-    set color red
-    set size 1.5
-    ask enemies [ setxy random-xcor random-ycor ]
-  ]
-  ask enemies 
-  [
-      if pcolor = scale-color grey ((random 500) + 5000)0 9000
-    [
-      die
-    ]
-  ]
-
-end
-
-to path
-  ask player [
-    if neighbors = any? enemies-here
-    [
-      set playerSurrounding "true" 
-    ]
-  ]
-end
-
-to check-patches
-  
-end
-
-to Move_Forward
-  ask player 
-  [
-    
-    set heading 0
-    if pycor != max-pycor
-    [
-    fd 2
-    ]
-  ]
-  
-  
-  
-end
-
-to Turn_Left
-  ask player[
-    
-    set heading 270
-    if pxcor != min-pxcor
-    [
-    fd 2
-    ]
-  ]
-end
-to Turn_Right
-  ask player[
-    set heading 90
-    if pxcor != max-pxcor
-    [
-    fd 2
-    ]
-  ]
- 
-end
-
-
-to Backwards
-  ask player[
-    set heading 180
-    if pycor != min-pycor
-    [
-    fd 2
-    ]
-  ]
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
-315
+210
 10
-754
+649
 470
 16
 16
@@ -165,12 +135,12 @@ ticks
 30.0
 
 BUTTON
-28
-11
-92
-44
+69
+51
+135
+84
 Setup
-Setup
+setup
 NIL
 1
 T
@@ -182,81 +152,40 @@ NIL
 1
 
 BUTTON
-105
-256
-183
-289
-Forward
-Move_Forward
-NIL
+18
+107
+81
+140
+Start
+create
+T
 1
 T
 OBSERVER
 NIL
-W
 NIL
-NIL
-1
-
-BUTTON
-32
-298
-98
-331
-Turn Left
-Turn_Left
-NIL
-1
-T
-OBSERVER
-NIL
-A
 NIL
 NIL
 1
 
-BUTTON
-184
-298
-262
-331
-Turn Right
-Turn_Right
-NIL
-1
-T
-OBSERVER
-NIL
-D
-NIL
-NIL
-1
-
-BUTTON
-106
-298
-177
-331
-NIL
-Backwards
-NIL
-1
-T
-OBSERVER
-NIL
-S
-NIL
-NIL
-1
-
-BUTTON
-108
+TEXTBOX
+26
+235
+176
+253
+Utilities
 11
-171
-44
-Play
-go
-T
+0.0
+1
+
+BUTTON
+7
+169
+70
+202
+Set
+set-level
+NIL
 1
 T
 OBSERVER
@@ -264,86 +193,97 @@ NIL
 NIL
 NIL
 NIL
-0
+1
+
+BUTTON
+72
+169
+135
+202
+Save
+save-level
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+138
+170
+201
+203
+Load
+load-level
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+17
+264
+83
+297
+Clean
+set tool \"Clear\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+18
+303
+81
+336
+Walls
+set tool \"Draw Wall\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 MONITOR
-25
-151
-82
-196
-Level
-level
+98
+269
+193
+314
+Selected Tool
+tool
 17
 1
 11
 
-BUTTON
-40
-90
-103
-123
-Easy
-NIL
-NIL
+MONITOR
+101
+106
+199
+151
+Selected Level
+Level
+17
 1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-124
-92
-204
-125
-Medium
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-222
-91
-285
-124
-Hard
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-113
-156
-215
-189
-Level Select
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
