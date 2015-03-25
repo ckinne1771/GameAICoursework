@@ -1,4 +1,5 @@
 extensions [array]
+globals [playerCorX playerCorY]
 
 breed [player player1]
 breed [enemy enemy1]
@@ -128,6 +129,7 @@ to playerForward
       [
         fd 1
       ]
+      set playerCorY pycor
       kombat
     ]
     
@@ -153,7 +155,9 @@ to playerBackwards
       [
         fd 1
       ]
+      set playerCorY pycor
       kombat
+      
     ]
   ]
   
@@ -177,6 +181,7 @@ to playerLeft
       [
         fd 1
       ]
+      set playerCorX pxcor
       kombat
       
    ]
@@ -202,6 +207,7 @@ to playerRight
       [
         fd 1
       ]
+      set playerCorX pxcor
       kombat
     ]
   ]
@@ -209,38 +215,64 @@ to playerRight
 end
 
 to enemyMove
-  ask enemy
-  [
        
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-    fd 1
+    ask enemy
+  [
+    ifelse playerCorY < pycor
+   [
+    set heading 180
     
+     fd 1
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 1
+     ]
+     [
+       ifelse  playerCorX > pxcor
+         [
+           set heading 90
+    
+           fd 1
+         ]
+         [
+           ifelse playerCorX < pxcor
+             [
+               set heading 270
+    
+               fd 1
+             ]
+             [
+               set heading 0
+             ]
+        ]
+     ]
+  ]
     if any? player in-radius 3
     [
      
       ask enemy-here [set state "persue"]
-      ask enemy-here[set heading towards Player1 0]
       ask enemy-here[print state]
       
     ]
     if any? player in-radius 1
     [
-    
-      
+     
       ask enemy-here [set state "combat"]
-      ask enemy-here[set heading towards Player1 0]
       ask enemy-here[print state]
     ]
   ]
   
   
+    
+  
+  
+  
+  
   
 end
-
-
 
 
 
