@@ -42,6 +42,7 @@ to setup-player
     set size 1
     setxy 10 10
     set heading 180
+    set health 3
   ]
 end
  
@@ -101,6 +102,56 @@ to Kombat
   
 end
 
+to enemyKombat
+  if any? other turtles-on patch-ahead 1
+  [
+    ask player
+    [
+      set health health - 1
+      if health <= 0
+      [
+        die
+      ]
+      
+    ]
+  ]
+end
+
+to enemyNavigate
+   ifelse playerCorY < pycor
+   [
+    set heading 180
+    
+     fd 1
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 1
+     ]
+     [
+       ifelse  playerCorX > pxcor
+         [
+           set heading 90
+    
+           fd 1
+         ]
+         [
+           ifelse playerCorX < pxcor
+             [
+               set heading 270
+    
+               fd 1
+             ]
+             [
+               set heading 0
+             ]
+        ]
+     ]
+  ]
+end
+
 to StateMachine
   if state = "patrol"
   [
@@ -131,6 +182,7 @@ to playerForward
       ]
       set playerCorY pycor
       kombat
+      
     ]
     
   ]
@@ -218,38 +270,27 @@ to enemyMove
        
     ask enemy
   [
-    ifelse playerCorY < pycor
-   [
-    set heading 180
     
-     fd 1
-   ]
-   [ ifelse playerCorY > pycor
-     [
-       set heading 0
+    if state = "patrol"
+    [
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 1
+    ]
     
-       fd 1
-     ]
-     [
-       ifelse  playerCorX > pxcor
-         [
-           set heading 90
+    if state = "persue"
+    [
+   enemyNavigate
+    ]
     
-           fd 1
-         ]
-         [
-           ifelse playerCorX < pxcor
-             [
-               set heading 270
+    if state = "combat"
+    [
+      enemyKombat
+    ]
     
-               fd 1
-             ]
-             [
-               set heading 0
-             ]
-        ]
-     ]
-  ]
     if any? player in-radius 3
     [
      
@@ -257,7 +298,7 @@ to enemyMove
       ask enemy-here[print state]
       
     ]
-    if any? player in-radius 1
+    if any? neighbors with [ any? player-here]
     [
      
       ask enemy-here [set state "combat"]
@@ -273,7 +314,6 @@ to enemyMove
   
   
 end
-
 
 
 @#$#@#$#@
