@@ -297,7 +297,6 @@ to enemyMove
     [
       if state != "combat"
     [
-     
       ask enemy-here [set state "persue"]
       ask enemy-here[print state]
     ]
@@ -305,8 +304,11 @@ to enemyMove
     ]
     if any? neighbors with [ any? player-here]
     [ 
+      if state = "persue"
+      [
       ask enemy-here [set state "combat"]
       ask enemy-here[print state]
+      ]
     ]
   ]
    
