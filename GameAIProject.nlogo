@@ -1,5 +1,5 @@
 extensions [array]
-globals [playerCorX playerCorY]
+globals [playerCorX playerCorY damage]
 
 breed [player player1]
 breed [enemy enemy1]
@@ -91,7 +91,8 @@ to Kombat
         ask enemy-on patch-ahead 1
         [
           set state "combat"
-          set health health - 1
+          set damage random 2
+          set health health - damage
           if health <= 0
           [
             die
@@ -107,12 +108,13 @@ to enemyKombat
   [
     ask player
     [
-      set health health - 1
+      set damage random 2
+      print damage
+      set health health - damage
       if health <= 0
       [
         die
       ]
-      
     ]
   ]
 end
@@ -283,7 +285,7 @@ to enemyMove
     
     if state = "persue"
     [
-   enemyNavigate
+     enemyNavigate
     ]
     
     if state = "combat"
@@ -293,26 +295,21 @@ to enemyMove
     
     if any? player in-radius 3
     [
+      if state != "combat"
+    [
      
       ask enemy-here [set state "persue"]
       ask enemy-here[print state]
+    ]
       
     ]
     if any? neighbors with [ any? player-here]
-    [
-     
+    [ 
       ask enemy-here [set state "combat"]
       ask enemy-here[print state]
     ]
   ]
-  
-  
-    
-  
-  
-  
-  
-  
+   
 end
 
 
