@@ -3,6 +3,7 @@ globals [playerCorX playerCorY damage]
 
 breed [player player1]
 breed [enemy enemy1]
+breed [boss jake]
 
 enemy-own 
 [
@@ -19,11 +20,21 @@ player-own
   headings
 ]
 
+boss-own
+[
+  level
+  state
+  health
+  index
+  headings
+]
+
 to setup
 clear-all
 setup-patches
 setup-player
 setup-enemy
+setup-boss
 reset-ticks
 end
 
@@ -56,6 +67,18 @@ to setup-enemy
     set health 3
     set state "patrol"
     
+  ]
+end
+
+to setup-boss
+  set-default-shape boss "person"
+  create-Boss 1
+  [
+    set color green
+    set size 1.5
+    ask boss [ setxy random-xcor random-ycor ]
+    set health 10
+    set state "patrol"
   ]
 end
 
@@ -97,7 +120,17 @@ to Kombat
           [
             die
           ]
-        ]  
+        ]
+        ask boss-on patch-ahead 1  
+        [
+          set state "combat"
+          set damage random 2
+          set health health - damage
+          if health <= 0
+          [
+            die
+          ]
+        ]
      
       ]
   
@@ -167,6 +200,7 @@ to Move_Forward
   
    playerForward
    enemyMove
+   bossMove
   
 end
 
@@ -195,7 +229,7 @@ to Backwards
   
   playerBackwards
   enemyMove
-  
+  bossMove
 end
 
 to playerBackwards
@@ -221,6 +255,7 @@ to turn_left
   
   playerLeft
   enemyMove
+  bossMove
   
 end
 
@@ -247,6 +282,7 @@ to turn_right
   
   playerRight
   enemyMove
+  bossMove
   
 end
 
@@ -314,6 +350,49 @@ to enemyMove
    
 end
 
+to bossMove
+  ask boss
+  [
+    
+    if state = "patrol"
+    [
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 1
+    ]
+    
+    if state = "persue"
+    [
+     enemyNavigate
+    ]
+    
+    if state = "combat"
+    [
+      enemyKombat
+    ]
+    
+    if any? player in-radius 3
+    [
+      if state != "combat"
+    [
+      ask boss-here [set state "persue"]
+      ask boss-here[print state]
+    ]
+      
+    ]
+    if any? neighbors with [ any? player-here]
+    [ 
+      if state = "persue"
+      [
+      ask boss-here [set state "combat"]
+      ask boss-here[print state]
+      ]
+    ]
+  ]
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
