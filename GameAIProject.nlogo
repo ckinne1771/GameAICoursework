@@ -1,12 +1,14 @@
 breed [player player1]
 player-own [ new-heading ]
 breed [enemies enemy]
-breed [jake jake1]
+;;breed [jake jake1]
+breed [gold treasure]
 globals 
 [ 
-  time-elapsed 
+  time 
   level
   tool
+  Loot
 ]
 
 patches-own 
@@ -16,65 +18,118 @@ patches-own
 
 to setup
 clear-all
+reset
 set level 1 
 load-map
 setup-player
 setup-enemies
+setup-gold
 reset-ticks
 end
 
+to test-map
+clear-all
+reset
+set level 1 
+load-test-map
+setup-player
+setup-enemies
+setup-gold
+reset-ticks
+end
+
+to load-test-map
+  import-pcolors "nltest.png"
+end
 to load-map  
-  ;; Filenames of Level Files
-  let choice 0
-  while[ choice <= 0 ]
-  [
-    set choice read-from-string user-input "Load What Level? (1 or greater)"
-    if choice <= 0
-    [ user-message "You must choose a positive level number to load." ]
-  ]
-  let filepath (word "../gamemap" choice ".csv")
-  ifelse user-yes-or-no? (word "Load File: " filepath
-         "\nThis will clear your current level and replace it with the level loaded."
-         "\nAre you sure you want to Load?")
-  [
-    import-world filepath
-    user-message "File Loaded."
-  ]
-  [ user-message "Load Canceled. File not loaded." ]
+  ;; Older Method of importing .csv game levels
+  ;;let choice 0
+  ;;while[ choice <= 0 ]
+  ;;[
+    ;;set choice read-from-string user-input "Load What Level? (1 or greater)"
+    ;;if choice <= 0
+    ;;[ user-message "You must choose a positive level number to load." ]
+  ;;]
+  ;;let filepath (word "../gamemap" choice ".csv")
+  ;;ifelse user-yes-or-no? (word "Load File: " filepath
+      ;;   "\nThis will clear your current level and replace it with the level loaded."
+    ;;     "\nAre you sure you want to Load?")
+  ;;[
+    ;;import-world filepath
+    ;;user-message "File Loaded."
+  ;;]
+  ;;[ user-message "Load Canceled. File not loaded." ]
+ 
+ let maps ["gamemap1.csv" "gamemap2.csv"]
+ 
+ ifelse ((level - 1) < length maps)
+ [
+   import-world item (level - 1) maps
+ ]
+ [ set level 1
+   load-map
+   stop
+ ]
+end
+
+to next-level
+  set level level + 1
+  load-map
+end
+
+to back-level
+  set level level - 1
+  load-map
 end
 
 to go
-  path
-  check-patches
+  check-player
+  check-enemies
+  increment-time
 end
 
 to setup-player
-  set-default-shape player "arrow"
-  create-Player 1
+  set-default-shape player "knight"
+  create-player 1
   [
-    set color blue
-    set size 1.5
-    setxy 10 10
-    set heading 180
+    set size 2
+    setxy random-pxcor random-pycor
+    set heading 0
   ]
+  check-player
+ 
 end
 
 to setup-enemies
   set-default-shape enemies "person"
-  create-enemies 10
+  create-enemies NumberOfEnemies
   [
     set color red
     set size 1.5
-    ask enemies [ setxy random-xcor random-ycor ]
-  ]
-  ask enemies 
-  [
-      if pcolor = scale-color grey ((random 500) + 5000)0 9000
-    [
-      die
-    ]
-  ]
+    setxy random-pxcor random-pycor
+  ]    
+ end
 
+to check-enemies
+ask enemies
+ [
+
+   if pcolor = black
+   [
+     ask enemies
+     [setxy random-pxcor random-pycor]
+    ]
+ ]
+end
+
+to setup-gold
+  set-default-shape gold "circle"
+  create-gold NumberOfCoins
+  [
+    set color yellow
+    set size 1
+   setxy random-pxcor random-pycor
+    ]
 end
 
 to path
@@ -86,19 +141,44 @@ to path
   ]
 end
 
-to check-patches
-  
+to check-player
+ ;; show random 100
+ ask player
+ [
+   if pcolor = 3.8
+   [ ;;set color green
+     ;;setup-player 
+     setxy random-xcor random-ycor]
+   
+   if pcolor = black
+   [
+     ask player
+     [setxy random-pxcor random-pycor]
+    ]
+ ]
 end
 
+to increment-time
+  set time timer + 1
+end
+
+to reset
+  reset-timer
+  set time 0
+end
 to Move_Forward
   ask player 
   [
-    
     set heading 0
     if pycor != max-pycor
     [
-    fd 2
+    fd 1
     ]
+    
+    if pcolor = black
+    [
+      fd -1
+      ]
   ]
   
   
@@ -111,8 +191,13 @@ to Turn_Left
     set heading 270
     if pxcor != min-pxcor
     [
-    fd 2
+    fd 1
     ]
+    
+    if pcolor = black
+    [
+      fd -1
+      ]
   ]
 end
 to Turn_Right
@@ -120,8 +205,13 @@ to Turn_Right
     set heading 90
     if pxcor != max-pxcor
     [
-    fd 2
+    fd 1
     ]
+    
+    if pcolor = black
+    [
+      fd -1
+      ]
   ]
  
 end
@@ -132,8 +222,13 @@ to Backwards
     set heading 180
     if pycor != min-pycor
     [
-    fd 2
+    fd 1
     ]
+    
+    if pcolor = black
+    [
+      fd -1
+      ]
   ]
 end
 @#$#@#$#@
@@ -165,10 +260,10 @@ ticks
 30.0
 
 BUTTON
-28
-11
-92
-44
+26
+36
+90
+69
 Setup
 Setup
 NIL
@@ -182,10 +277,10 @@ NIL
 1
 
 BUTTON
-105
-256
-183
-289
+104
+385
+182
+418
 Forward
 Move_Forward
 NIL
@@ -196,13 +291,13 @@ NIL
 W
 NIL
 NIL
-1
+0
 
 BUTTON
-32
-298
-98
-331
+31
+427
+97
+460
 Turn Left
 Turn_Left
 NIL
@@ -213,13 +308,13 @@ NIL
 A
 NIL
 NIL
-1
+0
 
 BUTTON
-184
-298
-262
-331
+183
+427
+261
+460
 Turn Right
 Turn_Right
 NIL
@@ -230,13 +325,13 @@ NIL
 D
 NIL
 NIL
-1
+0
 
 BUTTON
-106
-298
-177
-331
+105
+427
+176
+460
 NIL
 Backwards
 NIL
@@ -247,13 +342,13 @@ NIL
 S
 NIL
 NIL
-1
+0
 
 BUTTON
-108
-11
-171
-44
+227
+40
+290
+73
 Play
 go
 T
@@ -267,10 +362,10 @@ NIL
 0
 
 MONITOR
-25
-151
-82
-196
+17
+147
+74
+192
 Level
 level
 17
@@ -278,63 +373,12 @@ level
 11
 
 BUTTON
-40
-90
-103
-123
-Easy
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-124
-92
-204
-125
-Medium
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-222
-91
-285
-124
-Hard
-NIL
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-113
-156
-215
-189
+79
+147
+181
+180
 Level Select
-NIL
+next-level
 NIL
 1
 T
@@ -343,6 +387,128 @@ NIL
 NIL
 NIL
 NIL
+1
+
+BUTTON
+80
+185
+143
+218
+Back
+back-level
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+128
+37
+191
+70
+test
+test-map
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+16
+271
+188
+304
+NumberOfEnemies
+NumberOfEnemies
+1
+10
+5
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+25
+117
+175
+161
+LEVEL SELECTION
+15
+0.0
+1
+
+SLIDER
+15
+310
+187
+343
+NumberOfCoins
+NumberOfCoins
+1
+20
+10
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+19
+245
+169
+264
+Settings
+15
+0.0
+1
+
+MONITOR
+197
+270
+308
+315
+Remaining Time
+time
+0
+1
+11
+
+BUTTON
+223
+336
+288
+369
+Reset
+reset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+30
+384
+180
+402
+Controls
+11
+0.0
 1
 
 @#$#@#$#@
@@ -531,6 +697,46 @@ Rectangle -7500403 true true 45 120 255 285
 Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
+
+knight
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 195 60
+Rectangle -7500403 true false 150 45 165 90
+Rectangle -7500403 true false 30 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 30 105 106 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Polygon -13791810 true true 237 34 224 48 224 124 224 165 252 165 252 47 237 34
+Rectangle -1184463 true false 217 163 260 175
+Rectangle -7500403 true false 230 175 250 194
+Polygon -7500403 true false 224 162 190 121 167 121 217 193 230 194 229 174 217 174 217 162 224 161
+Rectangle -7500403 false false 195 112 215 148
+Rectangle -7500403 true false 196 111 217 158
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -1 false false 196 110 218 157
+Line -1 false 198 164 217 191
+Line -1 false 220 155 225 161
+Rectangle -1 false false 229 174 250 195
+Line -1 false 219 191 230 195
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
 
 leaf
 false

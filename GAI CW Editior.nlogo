@@ -31,6 +31,9 @@ to create
     
     if tool = "Draw Wall"
     [ draw-boundary black ]
+    
+    if tool = "Draw PlayerSpawn"
+    [ draw-boundary white ]
   ]
 end
 
@@ -284,6 +287,23 @@ Level
 17
 1
 11
+
+BUTTON
+19
+345
+130
+378
+Player Spawn
+set tool \"Draw PlayerSpawn\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
