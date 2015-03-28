@@ -1,5 +1,5 @@
 extensions [array]
-globals [playerCorX playerCorY]
+globals [playerCorX playerCorY damage]
 
 breed [player player1]
 breed [enemy enemy1]
@@ -42,6 +42,7 @@ to setup-player
     set size 1
     setxy 10 10
     set heading 180
+    set health 3
   ]
 end
  
@@ -90,7 +91,8 @@ to Kombat
         ask enemy-on patch-ahead 1
         [
           set state "combat"
-          set health health - 1
+          set damage random 2
+          set health health - damage
           if health <= 0
           [
             die
@@ -99,6 +101,57 @@ to Kombat
      
       ]
   
+end
+
+to enemyKombat
+  if any? other turtles-on patch-ahead 1
+  [
+    ask player
+    [
+      set damage random 2
+      print damage
+      set health health - damage
+      if health <= 0
+      [
+        die
+      ]
+    ]
+  ]
+end
+
+to enemyNavigate
+   ifelse playerCorY < pycor
+   [
+    set heading 180
+    
+     fd 1
+   ]
+   [ ifelse playerCorY > pycor
+     [
+       set heading 0
+    
+       fd 1
+     ]
+     [
+       ifelse  playerCorX > pxcor
+         [
+           set heading 90
+    
+           fd 1
+         ]
+         [
+           ifelse playerCorX < pxcor
+             [
+               set heading 270
+    
+               fd 1
+             ]
+             [
+               set heading 0
+             ]
+        ]
+     ]
+  ]
 end
 
 to StateMachine
@@ -131,6 +184,7 @@ to playerForward
       ]
       set playerCorY pycor
       kombat
+      
     ]
     
   ]
@@ -218,62 +272,47 @@ to enemyMove
        
     ask enemy
   [
-    ifelse playerCorY < pycor
-   [
-    set heading 180
     
-     fd 1
-   ]
-   [ ifelse playerCorY > pycor
-     [
-       set heading 0
+    if state = "patrol"
+    [
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 1
+    ]
     
-       fd 1
-     ]
-     [
-       ifelse  playerCorX > pxcor
-         [
-           set heading 90
+    if state = "persue"
+    [
+     enemyNavigate
+    ]
     
-           fd 1
-         ]
-         [
-           ifelse playerCorX < pxcor
-             [
-               set heading 270
+    if state = "combat"
+    [
+      enemyKombat
+    ]
     
-               fd 1
-             ]
-             [
-               set heading 0
-             ]
-        ]
-     ]
-  ]
     if any? player in-radius 3
     [
-     
+      if state != "combat"
+    [
       ask enemy-here [set state "persue"]
       ask enemy-here[print state]
+    ]
       
     ]
-    if any? player in-radius 1
-    [
-     
+    if any? neighbors with [ any? player-here]
+    [ 
+      if state = "persue"
+      [
       ask enemy-here [set state "combat"]
       ask enemy-here[print state]
+      ]
     ]
   ]
-  
-  
-    
-  
-  
-  
-  
-  
+   
 end
-
 
 
 @#$#@#$#@
