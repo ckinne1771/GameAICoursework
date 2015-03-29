@@ -329,7 +329,7 @@ to enemyMove
       enemyKombat
     ]
     
-    if any? player in-radius 3
+    ifelse any? player in-radius 3
     [
       if state != "combat"
     [
@@ -338,7 +338,10 @@ to enemyMove
     ]
       
     ]
-    if any? neighbors with [ any? player-here]
+    [
+      ask enemy-here [set state "patrol"]
+    ]
+    ifelse any? neighbors with [ any? player-here]
     [ 
       if state = "persue"
       [
@@ -346,6 +349,22 @@ to enemyMove
       ask enemy-here[print state]
       ]
     ]
+    [
+      if state = "combat"
+      [
+        ifelse any? player in-radius 3
+        [
+          ask enemy-here [set state "persue"]
+          ask enemy-here[print state]
+        ]
+        [
+           ask enemy-here [set state "patrol"]
+           ask enemy-here[print state]
+        ]
+      ]
+    ]
+    
+    
   ]
    
 end
@@ -374,7 +393,7 @@ to bossMove
       enemyKombat
     ]
     
-    if any? player in-radius 3
+    ifelse any? player in-radius 3
     [
       if state != "combat"
     [
@@ -383,7 +402,10 @@ to bossMove
     ]
       
     ]
-    if any? neighbors with [ any? player-here]
+    [
+      ask boss-here [set state "patrol"]
+    ]
+    ifelse any? neighbors with [ any? player-here]
     [ 
       if state = "persue"
       [
@@ -391,9 +413,24 @@ to bossMove
       ask boss-here[print state]
       ]
     ]
+    [
+      if state = "combat"
+      [
+        ifelse any? player in-radius 3
+        [
+          ask boss-here [set state "persue"]
+          ask boss-here[print state]
+        ]
+        [
+           ask boss-here [set state "patrol"]
+           ask boss-here[print state]
+        ]
+      ]
+    ]
+    
+    
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 315
