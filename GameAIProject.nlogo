@@ -90,7 +90,7 @@ end
 to path
   ask player 
   [
-    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    if pcolor = grey
     [
       set pcolor black
     ]
@@ -121,6 +121,7 @@ to Kombat
             die
           ]
         ]
+        
         ask boss-on patch-ahead 1  
         [
           set state "combat"
@@ -130,7 +131,7 @@ to Kombat
           [
             die
           ]
-        ]
+        ]  
      
       ]
   
@@ -201,7 +202,6 @@ to Move_Forward
    playerForward
    enemyMove
    bossMove
-  
 end
 
 to playerForward
@@ -230,6 +230,7 @@ to Backwards
   playerBackwards
   enemyMove
   bossMove
+  
 end
 
 to playerBackwards
@@ -338,9 +339,11 @@ to enemyMove
     ]
       
     ]
+    
     [
       ask enemy-here [set state "patrol"]
     ]
+    
     ifelse any? neighbors with [ any? player-here]
     [ 
       if state = "persue"
@@ -363,8 +366,6 @@ to enemyMove
         ]
       ]
     ]
-    
-    
   ]
    
 end
@@ -431,6 +432,7 @@ to bossMove
     
   ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 315
