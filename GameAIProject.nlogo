@@ -3,6 +3,7 @@ globals [playerCorX playerCorY damage]
 
 breed [player player1]
 breed [enemy enemy1]
+breed [boss jake]
 
 enemy-own 
 [
@@ -19,18 +20,28 @@ player-own
   headings
 ]
 
+boss-own
+[
+  level
+  state
+  health
+  index
+  headings
+]
+
 to setup
 clear-all
 setup-patches
 setup-player
 setup-enemy
+setup-boss
 reset-ticks
 end
 
 to setup-patches
   ask patches 
   [ 
-    set pcolor scale-color grey ((random 500) + 5000)0 9000
+    set pcolor gray
   ]
 end
 
@@ -59,6 +70,18 @@ to setup-enemy
   ]
 end
 
+to setup-boss
+  set-default-shape boss "person"
+  create-Boss 1
+  [
+    set color green
+    set size 1.5
+    ask boss [ setxy random-xcor random-ycor ]
+    set health 10
+    set state "patrol"
+  ]
+end
+
 to go
   path
   boundaries
@@ -67,7 +90,7 @@ end
 to path
   ask player 
   [
-    if pcolor = scale-color grey ((random 500) + 5000)0 9000
+    if pcolor = grey
     [
       set pcolor black
     ]
@@ -89,6 +112,17 @@ to Kombat
   if any? other turtles-on patch-ahead 1
      [
         ask enemy-on patch-ahead 1
+        [
+          set state "combat"
+          set damage random 2
+          set health health - damage
+          if health <= 0
+          [
+            die
+          ]
+        ]
+        
+        ask boss-on patch-ahead 1  
         [
           set state "combat"
           set damage random 2
@@ -167,7 +201,7 @@ to Move_Forward
   
    playerForward
    enemyMove
-  
+   bossMove
 end
 
 to playerForward
@@ -195,6 +229,7 @@ to Backwards
   
   playerBackwards
   enemyMove
+  bossMove
   
 end
 
@@ -221,6 +256,7 @@ to turn_left
   
   playerLeft
   enemyMove
+  bossMove
   
 end
 
@@ -247,6 +283,7 @@ to turn_right
   
   playerRight
   enemyMove
+  bossMove
   
 end
 
@@ -293,7 +330,7 @@ to enemyMove
       enemyKombat
     ]
     
-    if any? player in-radius 3
+    ifelse any? player in-radius 3
     [
       if state != "combat"
     [
@@ -302,7 +339,12 @@ to enemyMove
     ]
       
     ]
-    if any? neighbors with [ any? player-here]
+    
+    [
+      ask enemy-here [set state "patrol"]
+    ]
+    
+    ifelse any? neighbors with [ any? player-here]
     [ 
       if state = "persue"
       [
@@ -310,10 +352,86 @@ to enemyMove
       ask enemy-here[print state]
       ]
     ]
+    [
+      if state = "combat"
+      [
+        ifelse any? player in-radius 3
+        [
+          ask enemy-here [set state "persue"]
+          ask enemy-here[print state]
+        ]
+        [
+           ask enemy-here [set state "patrol"]
+           ask enemy-here[print state]
+        ]
+      ]
+    ]
   ]
    
 end
 
+to bossMove
+  ask boss
+  [
+    
+    if state = "patrol"
+    [
+    set headings array:from-list  [0 90 180 270]
+    set index random 3
+    let h array:item headings index
+    set heading h
+   
+    fd 1
+    ]
+    
+    if state = "persue"
+    [
+     enemyNavigate
+    ]
+    
+    if state = "combat"
+    [
+      enemyKombat
+    ]
+    
+    ifelse any? player in-radius 3
+    [
+      if state != "combat"
+    [
+      ask boss-here [set state "persue"]
+      ask boss-here[print state]
+    ]
+      
+    ]
+    [
+      ask boss-here [set state "patrol"]
+    ]
+    ifelse any? neighbors with [ any? player-here]
+    [ 
+      if state = "persue"
+      [
+      ask boss-here [set state "combat"]
+      ask boss-here[print state]
+      ]
+    ]
+    [
+      if state = "combat"
+      [
+        ifelse any? player in-radius 3
+        [
+          ask boss-here [set state "persue"]
+          ask boss-here[print state]
+        ]
+        [
+           ask boss-here [set state "patrol"]
+           ask boss-here[print state]
+        ]
+      ]
+    ]
+    
+    
+  ]
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
