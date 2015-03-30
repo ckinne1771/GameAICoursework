@@ -1,29 +1,29 @@
 breed [player player1]
 player-own [ new-heading ]
 breed [enemies enemy]
-;;breed [jake jake1]
+breed [jake jake1]
 breed [gold treasure]
 globals 
 [ 
   time 
   level
+  p-level
+  j-level
   tool
   Loot
-]
-
-patches-own 
-[
-  playerSurrounding
+  Score
 ]
 
 to setup
 clear-all
 reset
 set level 1 
+set p-level 1
+set j-level 1
 load-map
-setup-player
-setup-enemies
-setup-gold
+;;setup-player
+;;setup-enemies
+;;setup-gold
 reset-ticks
 end
 
@@ -31,6 +31,8 @@ to test-map
 clear-all
 reset
 set level 1 
+set p-level 1
+set j-level 1
 load-test-map
 setup-player
 setup-enemies
@@ -39,7 +41,18 @@ reset-ticks
 end
 
 to load-test-map
-  import-pcolors "nltest.png"
+  set score 0
+  let maps [ "GamePMap1.png" "GamePMap2.png" "GamePMap3.png" ]
+  
+  ifelse ((level - 1) < length maps)
+ [
+   import-pcolors item (level - 1) maps
+ ]
+ [ set level 1
+   load-test-map
+   stop
+ ]
+  ;;import-pcolors "nltest.png"
 end
 to load-map  
   ;; Older Method of importing .csv game levels
@@ -59,8 +72,8 @@ to load-map
     ;;user-message "File Loaded."
   ;;]
   ;;[ user-message "Load Canceled. File not loaded." ]
- 
- let maps ["gamemap1.csv" "gamemap2.csv"]
+ set score 0
+ let maps ["gamemap1.csv"]
  
  ifelse ((level - 1) < length maps)
  [
@@ -77,14 +90,25 @@ to next-level
   load-map
 end
 
+to next-plevel
+  set level level + 1
+  load-test-map
+end
+
 to back-level
   set level level - 1
   load-map
 end
 
+to back-plevel
+  set level level - 1
+  load-test-map
+end
+
 to go
   check-player
   check-enemies
+  check-gold
   increment-time
 end
 
@@ -119,6 +143,36 @@ ask enemies
      ask enemies
      [setxy random-pxcor random-pycor]
     ]
+   
+   if pcolor = white
+   [
+     ask enemies
+     [setxy random-pxcor random-pycor]
+    ]
+ ]
+end
+
+to check-gold
+ask gold
+ [
+
+   if pcolor = black
+   [
+     ask gold
+     [setxy random-pxcor random-pycor]
+    ]
+   
+   if pcolor = white
+   [
+     ask gold
+     [setxy random-pxcor random-pycor]
+    ]
+   
+   if any? enemies-here
+   [
+     ask gold
+     [setxy random-pxcor random-pycor]
+     ]
  ]
 end
 
@@ -132,23 +186,33 @@ to setup-gold
     ]
 end
 
-to path
-  ask player [
-    if neighbors = any? enemies-here
-    [
-      set playerSurrounding "true" 
+to loot-gold
+  if any? gold-here
+  [
+    set score score + 10
+    ask gold-here [die]
     ]
-  ]
+  
 end
 
 to check-player
- ;; show random 100
+
  ask player
  [
-   if pcolor = 3.8
-   [ ;;set color green
+   loot-gold
+   if score >= 100
+   [
+   set p-level 2  
+   ]
+   if score >= 200
+   [
+    set p-level 3
+   ]  
+  
+   ;;if pcolor = 3.8
+  ;; [ ;;set color green
      ;;setup-player 
-     setxy random-xcor random-ycor]
+    ;; setxy random-xcor random-ycor]
    
    if pcolor = black
    [
@@ -156,10 +220,17 @@ to check-player
      [setxy random-pxcor random-pycor]
     ]
  ]
+ 
 end
 
 to increment-time
   set time timer + 1
+  
+  if time > 59
+  [ set j-level 2]
+  
+  if time > 119
+  [ set j-level 3]
 end
 
 to reset
@@ -478,7 +549,7 @@ MONITOR
 270
 308
 315
-Remaining Time
+Time
 time
 0
 1
@@ -496,7 +567,7 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+R
 NIL
 NIL
 1
@@ -509,6 +580,73 @@ TEXTBOX
 Controls
 11
 0.0
+1
+
+MONITOR
+206
+147
+263
+192
+Score
+Score
+17
+1
+11
+
+MONITOR
+336
+490
+421
+535
+Player Level
+p-level
+17
+1
+11
+
+MONITOR
+444
+489
+530
+534
+J.A.K.E Level
+j-level
+17
+1
+11
+
+BUTTON
+188
+192
+313
+225
+Next Test Level
+next-plevel
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+208
+224
+297
+257
+Back Test
+back-plevel
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@

@@ -1,25 +1,46 @@
-turtles-own [ home-pos ]
+breed [player player1]
+player-own [ new-heading ]
+breed [enemies enemy]
+;;breed [jake jake1]
+breed [gold treasure]
 
 globals [
-  ;;difficulty    ;; Slider in Pac-Man.nlogo
+  time
   level         ;; Current Level
   ;;level-over?   ;; True when a level is complete
   ;;dead?         ;; True when pacman is loses a life
   tool          ;; The currently selected tool
+  Loot
+  Score
 ]
 
 to setup 
   if user-yes-or-no? "Do you want to clear current level?"
   [
     ca
-    ;;set difficulty 0
     set level 0
+    set Score 0
     ;;set level-over? false
     ;;set dead? false
     set tool "Clear"
     
+    create-player 1
+    [
+    set shape "Knight"  
+    set size 2
+    setxy 2 2
+    ]
+    
+ ;;   create-jake 1
+ ;;   [
+ ;;   set shape "Jake"  
+ ;;   set size 2 
+  ;;  setxy 1 1 
+  ;;  ]
+ 
+    
     ask patches 
-  [ set pcolor scale-color grey ((random 500) + 5000)0 9000]
+  [ set pcolor grey]
     ]
 end
 
@@ -34,13 +55,29 @@ to create
     
     if tool = "Draw PlayerSpawn"
     [ draw-boundary white ]
+    
+    if tool = "Draw Player"
+    [ place-player ]
+    
+    ;;if tool = "Draw Jake"
+    ;;[ place-jake ]
+    
+    if tool = "Draw Enemies"
+    [ place-enemies ]
+    
+    if tool = "Draw Gold"
+    [ place-gold ]
   ]
 end
 
 to clear
   ask patch (round mouse-xcor) (round mouse-ycor)
   [
-    set pcolor scale-color grey ((random 500) + 5000)0 9000
+    set pcolor grey
+    if any? turtles-here
+   [ ask gold-here[die]
+    ask enemies-here [die]]
+    
   ]
 end
 
@@ -49,6 +86,60 @@ to draw-boundary [ boundary-color ]
   [
      set pcolor boundary-color 
   ]
+end
+
+to place-player
+  ifelse [pcolor] of patch round mouse-xcor mouse-ycor != white
+  [user-message "Must be placed in the player spawn "]
+  [
+  ask player
+  [ setxy (round mouse-xcor) (round mouse-ycor) ]
+  ]
+end
+
+;;to place-jake
+;;  ifelse [pcolor] of patch round mouse-xcor mouse-ycor != grey
+ ;; [user-message "Cannot be placed here"]
+;;  [
+;;  ask jake
+;;  [ setxy (round mouse-xcor) (round mouse-ycor) ]
+;;  ]
+;;end
+
+to place-enemies
+  ask patch (round mouse-xcor) (round mouse-ycor)
+  [
+    ifelse pcolor != grey
+    [ user-message "Cannot be placed here"]
+    [
+      if not any? turtles-here
+      [
+        sprout-enemies 1
+        [
+          set color red
+          set shape "person"
+        ]
+      ]
+    ]
+  ]          
+end
+
+to place-gold
+  ask patch (round mouse-xcor) (round mouse-ycor)
+  [
+    ifelse pcolor != grey
+    [ user-message "Cannot be placed here"]
+    [
+      if not any? turtles-here
+      [
+        sprout-gold 1
+        [
+          set color yellow
+          set shape "circle"
+        ]
+      ]
+    ]
+  ]        
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -305,6 +396,57 @@ NIL
 NIL
 1
 
+BUTTON
+20
+388
+89
+421
+Player
+set tool \"Draw Player\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+21
+431
+103
+464
+Enemies
+set tool \"Draw Enemies\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+24
+471
+87
+504
+Gold
+set tool \"Draw Gold\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -491,6 +633,46 @@ Rectangle -7500403 true true 45 120 255 285
 Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
+
+knight
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 195 60
+Rectangle -7500403 true false 150 45 165 90
+Rectangle -7500403 true false 30 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 30 105 106 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Polygon -13791810 true true 237 34 224 48 224 124 224 165 252 165 252 47 237 34
+Rectangle -1184463 true false 217 163 260 175
+Rectangle -7500403 true false 230 175 250 194
+Polygon -7500403 true false 224 162 190 121 167 121 217 193 230 194 229 174 217 174 217 162 224 161
+Rectangle -7500403 false false 195 112 215 148
+Rectangle -7500403 true false 196 111 217 158
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -1 false false 196 110 218 157
+Line -1 false 198 164 217 191
+Line -1 false 220 155 225 161
+Rectangle -1 false false 229 174 250 195
+Line -1 false 219 191 230 195
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
 
 leaf
 false
