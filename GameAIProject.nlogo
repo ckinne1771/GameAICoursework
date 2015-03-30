@@ -58,7 +58,7 @@ to setup-player
 end
  
 to setup-enemy
-  set-default-shape enemy "person"
+  set-default-shape enemy "witch"
   create-Enemy 2
   [
     set color red
@@ -891,6 +891,29 @@ Line -7500403 true 216 40 79 269
 Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
+
+witch
+false
+0
+Polygon -16777216 true false 91 160 32 287 191 287 106 118
+Circle -2064490 true false 64 88 90
+Circle -11221820 true false 124 118 13
+Circle -16777216 true false 128 122 6
+Polygon -16777216 true false 93 167 122 161
+Line -16777216 false 95 164 113 168
+Circle -11221820 true false 79 119 13
+Circle -16777216 true false 82 122 6
+Circle -11221820 true false 124 118 14
+Circle -16777216 true false 127 121 8
+Polygon -1184463 true false 70 137 95 104 102 130 123 106 123 124 140 112 192 268 232 210 131 78 87 79 1 229 26 270 90 79
+Line -16777216 false 103 136 97 149
+Line -16777216 false 97 149 104 152
+Polygon -13345367 true false 73 105 157 94 140 83 103 16 75 94 59 106
+Polygon -16777216 true false 101 65 107 45 112 66 126 64 114 76 126 88 106 79 92 89 99 74 86 70
+Polygon -2064490 true false 67 211 85 249 56 237
+Polygon -2064490 true false 157 218 172 246 138 250 158 216
+Line -6459832 false 141 253 120 212
+Polygon -1184463 true false 114 207 112 191 123 203 142 202 130 213 140 229 123 221 112 235 113 215 99 212
 
 wolf
 false
