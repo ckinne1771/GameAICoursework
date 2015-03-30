@@ -41,7 +41,7 @@ end
 to setup-patches
   ask patches 
   [ 
-    set pcolor scale-color grey ((random 500) + 5000)0 9000
+    set pcolor gray
   ]
 end
 
