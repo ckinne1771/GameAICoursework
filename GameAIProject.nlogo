@@ -1,9 +1,8 @@
 extensions [array]
-globals [playerCorX playerCorY damage]
-
 breed [player player1]
 breed [enemy enemy1]
 breed [boss jake]
+breed [gold treasure]
 
 enemy-own 
 [
@@ -15,97 +14,159 @@ enemy-own
 
 player-own
 [
-  level
   health
   headings
 ]
 
 boss-own
 [
-  level
-  state
+  jstate
   health
   index
   headings
 ]
 
+
+globals 
+[ 
+  time 
+  level
+  dead?
+  game-over?
+  tool
+  Loot
+  Score
+  playerCorX 
+  playerCorY 
+  damage
+  plevel
+  jlevel
+  pattack
+  jattack
+]
+
 to setup
 clear-all
-setup-patches
-setup-player
-setup-enemy
-setup-boss
+reset
+set dead? false
+set game-over? false
+set level 1 
+load-map
 reset-ticks
 end
 
-to setup-patches
-  ask patches 
-  [ 
-    set pcolor gray
-  ]
+to test-map
+clear-all
+reset
+set dead? false
+set game-over? false
+set level 1 
+load-test-map
+setup-player
+setup-enemies
+setup-boss
+setup-gold
+reset-ticks
 end
 
-to setup-player
-  set-default-shape player "arrow"
-  create-Player 1
-  [
-    set color blue
-    set size 1
-    setxy 10 10
-    set heading 180
-    set health 3
-  ]
+to load-test-map
+  set score 0
+  let maps [ "GamePMap1.png" "GamePMap2.png" "GamePMap3.png" ]
+  
+  ifelse ((level - 1) < length maps)
+ [
+   import-pcolors item (level - 1) maps
+ ]
+ [ set level 1
+   load-test-map
+   stop
+ ]
 end
+
+to load-map  
+ set score 0
+ let maps ["gamemap1.csv"]
  
-to setup-enemy
-  set-default-shape enemy "person"
-  create-Enemy 2
-  [
-    set color red
-    set size 1.5
-    ask enemy [ setxy random-xcor random-ycor ]
-    set health 3
-    set state "patrol"
-    
-  ]
+ ifelse ((level - 1) < length maps)
+ [
+   import-world item (level - 1) maps
+ ]
+ [ set level 1
+   load-map
+   stop
+ ]
 end
 
-to setup-boss
-  set-default-shape boss "person"
-  create-Boss 1
-  [
-    set color green
-    set size 1.5
-    ask boss [ setxy random-xcor random-ycor ]
-    set health 10
-    set state "patrol"
-  ]
+to next-level
+  set level level + 1
+  load-map
+end
+
+to next-plevel
+  set level level + 1
+  load-test-map
+end
+
+to back-level
+  set level level - 1
+  load-map
+end
+
+to back-plevel
+  set level level - 1
+  load-test-map
 end
 
 to go
-  path
-  boundaries
+  check-player
+  check-enemies
+  check-boss
+  check-gold
+  increment-time
 end
 
-to path
-  ask player 
+to setup-player
+  set-default-shape player "knight down"
+  create-player 1
   [
-    if pcolor = grey
-    [
-      set pcolor black
-    ]
+    set size 2
+    ;;setxy random-pxcor random-pycor
+    if pcolor != white
+    [setxy random-pxcor random-pycor]
+    set heading 0
+    set health 3
+    set plevel 1
+    set pattack 2
   ]
+  check-player
+ 
 end
 
-to boundaries
-   ask player
+to setup-enemies
+  set-default-shape enemy "witch"
+  create-enemy NumberOfEnemies
   [
-    if xcor >= 16
-    [
-      stop
-    ]
+    set color red
+    set size 1.5
+    setxy random-pxcor random-pycor
+    set health 3
+    set state "patrol"
+  ]    
+ end
+
+to setup-boss
+  set-default-shape boss "j.a.k.e"
+  create-Boss 1
+  [
+    set color green
+    set size 3
+    ask boss [ setxy random-xcor random-ycor ]
+    set health 10
+    set jstate "persue"
+    set jlevel 1
+    set jattack 3
   ]
-  
+  check-boss
 end
 
 to Kombat
@@ -114,7 +175,7 @@ to Kombat
         ask enemy-on patch-ahead 1
         [
           set state "combat"
-          set damage random 2
+          set damage random pattack
           set health health - damage
           if health <= 0
           [
@@ -124,8 +185,8 @@ to Kombat
         
         ask boss-on patch-ahead 1  
         [
-          set state "combat"
-          set damage random 2
+          set jstate "combat"
+          set damage random pattack
           set health health - damage
           if health <= 0
           [
@@ -135,6 +196,46 @@ to Kombat
      
       ]
   
+end
+
+to check-enemies
+ask enemy
+ [
+if time <= 3
+[
+   if pcolor = black
+   [
+     ask enemy
+     [setxy random-pxcor random-pycor]
+    ]
+] 
+   if pcolor = white
+   [
+     ask enemy
+     [setxy random-pxcor random-pycor]
+    ]
+
+ ]
+end
+
+to check-boss
+ask boss
+ [
+if time <= 3
+[
+   if pcolor = black
+   [
+     ask boss
+     [setxy random-pxcor random-pycor]
+    ]
+]
+   if pcolor = white
+   [
+     ask boss
+     [setxy random-pxcor random-pycor]
+   ]
+   
+ ]
 end
 
 to enemyKombat
@@ -147,7 +248,27 @@ to enemyKombat
       set health health - damage
       if health <= 0
       [
-        die
+        set dead? true
+       ;; die
+        ;;stop
+      ]
+    ]
+  ]
+end
+
+to bossKombat
+  if any? other turtles-on patch-ahead 1
+  [
+    ask player
+    [
+      set damage random jattack
+      print damage
+      set health health - damage
+      if health <= 0
+      [
+        set dead? true
+       ;; die
+        ;;stop
       ]
     ]
   ]
@@ -188,33 +309,58 @@ to enemyNavigate
   ]
 end
 
-to StateMachine
-  if state = "patrol"
-  [
-    
-  ]
-  
-end
+to check-gold
+ask gold
+ [
 
+   if pcolor = black
+   [
+     ask gold
+     [setxy random-pxcor random-pycor]
+    ]
+   
+   if pcolor = white
+   [
+     ask gold
+     [setxy random-pxcor random-pycor]
+    ]
+   
+  ;; if any? enemy-here
+   ;;[
+    ;; ask gold
+     ;;[setxy random-pxcor random-pycor]
+    ;; ]
+ ]
+end
 
 to Move_Forward
   
    playerForward
    enemyMove
    bossMove
+   loot-gold
 end
 
-to playerForward
-  
-  
+to playerForward 
   ask player
   [
+     if shape != "knight up"
+  [set shape "knight up" ]
+  
     set heading 0
     if pxcor != min-pxcor
     [
-      if not any? other turtles-on patch-ahead 1
+      if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
+      ]
+      
+      if pcolor = black
+    [
+      fd -1
       ]
       set playerCorY pycor
       kombat
@@ -230,19 +376,30 @@ to Backwards
   playerBackwards
   enemyMove
   bossMove
+  loot-gold
   
 end
 
 to playerBackwards
-  
    ask player
   [
+      if shape != "knight down"
+  [set shape "knight down" ]
+  
     set heading 180
     if pycor != min-pycor
     [
-      if not any? other turtles-on patch-ahead 1
+      if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
+      ]
+      
+      if pcolor = black
+    [
+      fd -1
       ]
       set playerCorY pycor
       kombat
@@ -257,19 +414,30 @@ to turn_left
   playerLeft
   enemyMove
   bossMove
+  loot-gold
   
 end
 
 to playerLeft
-  
   ask player
   [
+    if shape != "knight left"
+  [set shape "knight left" ]
+  
     set heading 270
     if pycor != min-pycor
     [
-    if not any? other turtles-on patch-ahead 1
+   if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
+      ]
+      
+      if pcolor = black
+    [
+      fd -1
       ]
       set playerCorX pxcor
       kombat
@@ -284,19 +452,30 @@ to turn_right
   playerRight
   enemyMove
   bossMove
+  loot-gold
   
 end
 
 to playerRight
-  
   ask player
   [
+  if shape != "knight right"
+  [set shape "knight right" ]
+  
     set heading 90
     if pycor != min-pycor
     [
     if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
+      ]
+      
+      if pcolor = black
+    [
+      fd -1
       ]
       set playerCorX pxcor
       kombat
@@ -320,6 +499,11 @@ to enemyMove
     fd 1
     ]
     
+    if pcolor = black
+    [
+      fd -1
+      ]
+    
     if state = "persue"
     [
      enemyNavigate
@@ -327,7 +511,7 @@ to enemyMove
     
     if state = "combat"
     [
-      enemyKombat
+      bossKombat
     ]
     
     ifelse any? player in-radius 3
@@ -371,68 +555,138 @@ to enemyMove
 end
 
 to bossMove
-  ask boss
+  
+         
+    ask boss
   [
     
-    if state = "patrol"
+    if pcolor = black
     [
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 1
-    ]
+      fd -1
+      ]
     
-    if state = "persue"
+    if jstate = "persue"
     [
      enemyNavigate
     ]
     
-    if state = "combat"
+    if jstate = "combat"
     [
       enemyKombat
     ]
     
-    ifelse any? player in-radius 3
+    if any? player in-radius 3
     [
-      if state != "combat"
+      if jstate != "combat"
     [
-      ask boss-here [set state "persue"]
-      ask boss-here[print state]
+      ask boss-here [set jstate "persue"]
+      ask boss-here[print jstate]
     ]
       
     ]
-    [
-      ask boss-here [set state "patrol"]
-    ]
+    
     ifelse any? neighbors with [ any? player-here]
     [ 
-      if state = "persue"
+      if jstate = "persue"
       [
-      ask boss-here [set state "combat"]
-      ask boss-here[print state]
+      ask boss-here [set jstate "combat"]
+      ask boss-here[print jstate]
       ]
     ]
     [
-      if state = "combat"
+      if jstate = "combat"
       [
         ifelse any? player in-radius 3
         [
-          ask boss-here [set state "persue"]
-          ask boss-here[print state]
+          ask boss-here [set jstate "persue"]
+          ask boss-here[print jstate]
         ]
         [
-           ask boss-here [set state "patrol"]
-           ask boss-here[print state]
+           ask boss-here [set jstate "patrol"]
+           ask boss-here[print jstate]
         ]
       ]
     ]
+  ]
+  
+  
+end
     
     
+  
+
+to setup-gold
+  set-default-shape gold "circle"
+  create-gold NumberOfCoins
+  [
+    set color yellow
+    set size 1
+   setxy random-pxcor random-pycor
+    ]
+end
+
+to loot-gold
+  ask player[
+  if any? gold-here
+  [
+    set score score + 10
+    ask gold-here [die]
+    ]
+  ]
+  
+end
+
+to check-player
+if dead? = true
+[
+  user-message "YOU DIED !"
+]
+ ask player
+ [
+   ;;loot-gold
+   if score >= 50
+   [
+   set plevel 2 
+   set health 3 
+   ]
+   if score >= 100
+   [
+    set plevel 3
+    set health 4
+   ] 
+   if time <= 3
+   [ 
+   if pcolor != white
+   ;;if pcolor = black
+   [
+     ask player
+     [setxy random-pxcor random-pycor]
+    ]
+   ]
+ ]
+ 
+end
+
+to increment-time
+  set time timer + 1
+  
+  if time > 59
+  [ 
+     set jlevel 2
+     set jattack 4
+  ]
+  
+  if time > 119
+  [
+    set jlevel 3
+    set jattack 5
   ]
 end
 
+to reset
+  reset-timer
+  set time 0
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 315
@@ -462,10 +716,10 @@ ticks
 30.0
 
 BUTTON
-62
-74
-126
-107
+26
+36
+90
+69
 Setup
 Setup
 NIL
@@ -479,10 +733,10 @@ NIL
 1
 
 BUTTON
-100
-169
-178
-202
+104
+385
+182
+418
 Forward
 Move_Forward
 NIL
@@ -493,15 +747,15 @@ NIL
 W
 NIL
 NIL
-1
+0
 
 BUTTON
-27
-211
-93
-244
+22
+426
+88
+459
 Turn Left
-Turn_Left
+turn_Left
 NIL
 1
 T
@@ -510,15 +764,15 @@ NIL
 A
 NIL
 NIL
-1
+0
 
 BUTTON
-179
-211
-257
-244
+203
+432
+281
+465
 Turn Right
-Turn_Right
+turn_Right
 NIL
 1
 T
@@ -527,14 +781,14 @@ NIL
 D
 NIL
 NIL
-1
+0
 
 BUTTON
-101
-211
-172
-244
-NIL
+95
+428
+191
+461
+Backwards
 Backwards
 NIL
 1
@@ -544,14 +798,14 @@ NIL
 S
 NIL
 NIL
-1
+0
 
 BUTTON
-150
-75
-213
-108
-NIL
+227
+40
+290
+73
+Play
 go
 T
 1
@@ -562,6 +816,234 @@ NIL
 NIL
 NIL
 0
+
+MONITOR
+17
+147
+74
+192
+Level
+level
+17
+1
+11
+
+BUTTON
+79
+147
+181
+180
+Level Select
+next-level
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+80
+185
+143
+218
+Back
+back-level
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+128
+37
+191
+70
+test
+test-map
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+16
+271
+188
+304
+NumberOfEnemies
+NumberOfEnemies
+1
+10
+5
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+25
+117
+175
+161
+LEVEL SELECTION
+15
+0.0
+1
+
+SLIDER
+15
+310
+187
+343
+NumberOfCoins
+NumberOfCoins
+1
+20
+10
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+19
+245
+169
+264
+Settings
+15
+0.0
+1
+
+MONITOR
+197
+270
+308
+315
+Time
+time
+0
+1
+11
+
+BUTTON
+223
+336
+288
+369
+Reset
+reset
+NIL
+1
+T
+OBSERVER
+NIL
+R
+NIL
+NIL
+1
+
+TEXTBOX
+30
+384
+180
+402
+Controls
+11
+0.0
+1
+
+MONITOR
+206
+147
+263
+192
+Score
+Score
+17
+1
+11
+
+MONITOR
+336
+490
+421
+535
+Player Level
+plevel
+17
+1
+11
+
+MONITOR
+444
+489
+530
+534
+J.A.K.E Level
+jlevel
+17
+1
+11
+
+BUTTON
+188
+192
+313
+225
+Next Test Level
+next-plevel
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+208
+224
+297
+257
+Back Test
+back-plevel
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+92
+490
+149
+535
+NIL
+dead?
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -750,6 +1232,208 @@ Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
 
+j.a.k.e
+false
+0
+Polygon -16777216 true false 95 48 150 49 165 122 165 222 261 222 253 228 95 229 96 138 89 116 91 49
+Circle -2674135 true false 97 75 8
+Circle -2674135 true false 112 72 12
+Rectangle -1 true false 98 93 101 98
+Rectangle -1 true false 99 101 102 105
+Rectangle -1 true false 101 95 105 101
+Rectangle -1 true false 107 97 112 102
+Rectangle -1 true false 103 103 105 106
+Rectangle -1 true false 108 103 113 108
+Rectangle -1 true false 114 101 117 103
+Rectangle -1 true false 114 104 117 108
+Rectangle -1 true false 119 97 124 102
+Rectangle -1 true false 118 105 124 109
+Rectangle -1 true false 126 100 130 103
+Rectangle -1 true false 126 94 131 98
+
+knight
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 195 60
+Rectangle -7500403 true false 150 45 165 90
+Rectangle -7500403 true false 30 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 30 105 106 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Polygon -13791810 true true 237 34 224 48 224 124 224 165 252 165 252 47 237 34
+Rectangle -1184463 true false 217 163 260 175
+Rectangle -7500403 true false 230 175 250 194
+Polygon -7500403 true false 224 162 190 121 167 121 217 193 230 194 229 174 217 174 217 162 224 161
+Rectangle -7500403 false false 195 112 215 148
+Rectangle -7500403 true false 196 111 217 158
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -1 false false 196 110 218 157
+Line -1 false 198 164 217 191
+Line -1 false 220 155 225 161
+Rectangle -1 false false 229 174 250 195
+Line -1 false 219 191 230 195
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
+
+knight down
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 180 60
+Rectangle -7500403 true false 120 45 150 90
+Rectangle -7500403 true false 45 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 45 105 105 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Rectangle -7500403 true false 125 175 145 194
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Rectangle -7500403 true false 150 105 210 165
+Rectangle -1 false false 150 105 210 165
+Rectangle -1 false false 124 174 145 195
+Polygon -13791810 true true 132 34 119 48 119 124 119 165 147 165 147 47 132 34
+Rectangle -1 false false 145 165 176 195
+Rectangle -1184463 true false 112 163 155 175
+Polygon -1 false false 133 35 119 47 120 161 113 161 114 172 155 174 155 162 148 161 147 46 133 37
+
+knight left
+false
+9
+Rectangle -7500403 true false 105 30 225 120
+Rectangle -16777216 true false 105 45 210 60
+Rectangle -7500403 true false 135 45 150 90
+Rectangle -7500403 true false 195 105 270 165
+Rectangle -7500403 false false 210 165 240 210
+Rectangle -7500403 true false 210 165 240 210
+Rectangle -1 false false 194 105 270 165
+Rectangle -1 false false 209 165 239 211
+Line -1 false 225 30 225 105
+Line -1 false 105 30 225 30
+Line -1 false 105 30 105 120
+Line -1 false 105 120 195 120
+Polygon -13791810 true true 63 34 76 48 76 124 76 165 48 165 48 47 63 34
+Rectangle -1184463 true false 40 163 83 175
+Rectangle -7500403 true false 50 175 70 194
+Polygon -7500403 true false 76 162 110 121 133 121 83 193 70 194 71 174 83 174 83 162 76 161
+Rectangle -7500403 false false 85 112 105 148
+Rectangle -7500403 true false 83 111 104 158
+Rectangle -7500403 true false 104 120 193 221
+Line -1 false 104 110 194 109
+Rectangle -7500403 true false 203 195 248 222
+Rectangle -1 false false 204 194 248 223
+Polygon -7500403 true false 193 166 208 165 208 192 203 192 203 221 192 221 192 165 207 164
+Line -1 false 201 221 102 221
+Line -1 false 103 163 103 220
+Line -1 false 104 110 103 220
+Rectangle -1 false false 82 110 104 157
+Line -1 false 102 164 83 191
+Line -1 false 80 155 75 161
+Rectangle -1 false false 50 174 71 195
+Line -1 false 81 191 70 195
+Rectangle -7500403 true false 73 221 134 243
+Rectangle -7500403 true false 197 224 258 246
+Rectangle -1 false false 196 224 258 245
+Rectangle -1 false false 73 221 134 244
+Polygon -1 false false 62 35 76 47 75 161 82 161 81 172 40 174 40 162 47 161 48 46 62 37
+
+knight right
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 195 60
+Rectangle -7500403 true false 150 45 165 90
+Rectangle -7500403 true false 30 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 30 105 106 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Polygon -13791810 true true 237 34 224 48 224 124 224 165 252 165 252 47 237 34
+Rectangle -1184463 true false 217 163 260 175
+Rectangle -7500403 true false 230 175 250 194
+Polygon -7500403 true false 224 162 190 121 167 121 217 193 230 194 229 174 217 174 217 162 224 161
+Rectangle -7500403 false false 195 112 215 148
+Rectangle -7500403 true false 196 111 217 158
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -1 false false 196 110 218 157
+Line -1 false 198 164 217 191
+Line -1 false 220 155 225 161
+Rectangle -1 false false 229 174 250 195
+Line -1 false 219 191 230 195
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
+
+knight up
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -7500403 true false 45 105 105 165
+Rectangle -1 false false 45 105 105 165
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Rectangle -7500403 true false 125 175 145 194
+Line -1 false 196 110 106 109
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Rectangle -7500403 true false 165 105 225 165
+Rectangle -1 false false 165 105 225 165
+Rectangle -7500403 true false 75 105 195 225
+Rectangle -7500403 true false 195 165 210 195
+Rectangle -7500403 true false 196 196 220 220
+Rectangle -1 false false 197 165 211 195
+Rectangle -1 false false 195 196 221 221
+Rectangle -1 false false 75 105 195 225
+
 leaf
 false
 0
@@ -891,6 +1575,29 @@ Line -7500403 true 216 40 79 269
 Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
+
+witch
+false
+0
+Polygon -16777216 true false 91 160 32 287 191 287 106 118
+Circle -2064490 true false 64 88 90
+Circle -11221820 true false 124 118 13
+Circle -16777216 true false 128 122 6
+Polygon -16777216 true false 93 167 122 161
+Line -16777216 false 95 164 113 168
+Circle -11221820 true false 79 119 13
+Circle -16777216 true false 82 122 6
+Circle -11221820 true false 124 118 14
+Circle -16777216 true false 127 121 8
+Polygon -1184463 true false 70 137 95 104 102 130 123 106 123 124 140 112 192 268 232 210 131 78 87 79 1 229 26 270 90 79
+Line -16777216 false 103 136 97 149
+Line -16777216 false 97 149 104 152
+Polygon -13345367 true false 73 105 157 94 140 83 103 16 75 94 59 106
+Polygon -16777216 true false 101 65 107 45 112 66 126 64 114 76 126 88 106 79 92 89 99 74 86 70
+Polygon -2064490 true false 67 211 85 249 56 237
+Polygon -2064490 true false 157 218 172 246 138 250 158 216
+Line -6459832 false 141 253 120 212
+Polygon -1184463 true false 114 207 112 191 123 203 142 202 130 213 140 229 123 221 112 235 113 215 99 212
 
 wolf
 false
