@@ -159,7 +159,7 @@ to setup-boss
     set size 3
     ask boss [ setxy random-xcor random-ycor ]
     set health 10
-    set jstate "patrol"
+    set jstate "persue"
     set jlevel 1
   ]
   check-boss
@@ -538,16 +538,6 @@ to bossMove
     ask boss
   [
     
-    if jstate = "patrol"
-    [
-    set headings array:from-list  [0 90 180 270]
-    set index random 3
-    let h array:item headings index
-    set heading h
-   
-    fd 1
-    ]
-    
     if pcolor = black
     [
       fd -1
@@ -563,7 +553,7 @@ to bossMove
       enemyKombat
     ]
     
-    ifelse any? player in-radius 3
+    if any? player in-radius 3
     [
       if jstate != "combat"
     [
@@ -571,10 +561,6 @@ to bossMove
       ask boss-here[print jstate]
     ]
       
-    ]
-    
-    [
-      ask boss-here [set jstate "patrol"]
     ]
     
     ifelse any? neighbors with [ any? player-here]
