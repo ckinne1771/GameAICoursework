@@ -330,7 +330,10 @@ to playerForward
     [
       if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
       ]
       
       if pcolor = black
@@ -366,7 +369,10 @@ to playerBackwards
     [
       if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
       ]
       
       if pcolor = black
@@ -399,9 +405,12 @@ to playerLeft
     set heading 270
     if pycor != min-pycor
     [
-    if not any? enemy-on patch-ahead 1
+   if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
       ]
       
       if pcolor = black
@@ -436,7 +445,10 @@ to playerRight
     [
     if not any? enemy-on patch-ahead 1
       [
-        fd 1
+         if not any? boss-on patch-ahead 1
+         [
+           fd 1
+         ]
       ]
       
       if pcolor = black
@@ -521,18 +533,12 @@ to enemyMove
 end
 
 to bossMove
-ask boss
- [
-   if jlevel > plevel
-   [
-   set jstate "patrol"
-   ]
-   if jlevel <= plevel
-   [
-     set jstate "persue"
-   ]
-   
-   if jstate = "patrol"
+  
+         
+    ask boss
+  [
+    
+    if jstate = "patrol"
     [
     set headings array:from-list  [0 90 180 270]
     set index random 3
@@ -545,24 +551,32 @@ ask boss
     if pcolor = black
     [
       fd -1
-    ]
-     if jstate = "persue"
-    [
-      if any? gold in-radius 3
-      [
-       ask boss-here
-       [
-        set jstate loot
-        print jstate
-       ]
       ]
+    
+    if jstate = "persue"
+    [
      enemyNavigate
     ]
-    if jstate = "combat" 
+    
+    if jstate = "combat"
     [
       enemyKombat
     ]
-   
+    
+    ifelse any? player in-radius 3
+    [
+      if jstate != "combat"
+    [
+      ask boss-here [set jstate "persue"]
+      ask boss-here[print jstate]
+    ]
+      
+    ]
+    
+    [
+      ask boss-here [set jstate "patrol"]
+    ]
+    
     ifelse any? neighbors with [ any? player-here]
     [ 
       if jstate = "persue"
@@ -585,14 +599,10 @@ ask boss
         ]
       ]
     ]
-   
-   if jstate = "loot"
-   [
-     
-   ]
-   
- ]
-  end
+  ]
+  
+  
+end
     
     
   
@@ -1587,7 +1597,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2-RC3
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
