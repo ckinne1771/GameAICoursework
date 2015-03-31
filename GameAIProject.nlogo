@@ -41,6 +41,8 @@ globals
   damage
   plevel
   jlevel
+  pattack
+  jattack
 ]
 
 to setup
@@ -134,6 +136,7 @@ to setup-player
     set heading 0
     set health 3
     set plevel 1
+    set pattack 2
   ]
   check-player
  
@@ -161,6 +164,7 @@ to setup-boss
     set health 10
     set jstate "persue"
     set jlevel 1
+    set jattack 3
   ]
   check-boss
 end
@@ -171,7 +175,7 @@ to Kombat
         ask enemy-on patch-ahead 1
         [
           set state "combat"
-          set damage random 2
+          set damage random pattack
           set health health - damage
           if health <= 0
           [
@@ -182,7 +186,7 @@ to Kombat
         ask boss-on patch-ahead 1  
         [
           set jstate "combat"
-          set damage random 2
+          set damage random pattack
           set health health - damage
           if health <= 0
           [
@@ -240,6 +244,24 @@ to enemyKombat
     ask player
     [
       set damage random 2
+      print damage
+      set health health - damage
+      if health <= 0
+      [
+        set dead? true
+       ;; die
+        ;;stop
+      ]
+    ]
+  ]
+end
+
+to bossKombat
+  if any? other turtles-on patch-ahead 1
+  [
+    ask player
+    [
+      set damage random jattack
       print damage
       set health health - damage
       if health <= 0
@@ -489,7 +511,7 @@ to enemyMove
     
     if state = "combat"
     [
-      enemyKombat
+      bossKombat
     ]
     
     ifelse any? player in-radius 3
@@ -622,13 +644,15 @@ if dead? = true
  ask player
  [
    ;;loot-gold
+   if score >= 50
+   [
+   set plevel 2 
+   set health 3 
+   ]
    if score >= 100
    [
-   set plevel 2  
-   ]
-   if score >= 200
-   [
     set plevel 3
+    set health 4
    ] 
    if time <= 3
    [ 
@@ -647,10 +671,16 @@ to increment-time
   set time timer + 1
   
   if time > 59
-  [ set jlevel 2]
+  [ 
+     set jlevel 2
+     set jattack 4
+  ]
   
   if time > 119
-  [ set jlevel 3]
+  [
+    set jlevel 3
+    set jattack 5
+  ]
 end
 
 to reset
