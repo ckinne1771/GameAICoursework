@@ -33,12 +33,14 @@ globals
   level
   dead?
   game-over?
+  win?
   tool
   Loot
   Score
   playerCorX 
   playerCorY 
   damage
+  phealth
   plevel
   jlevel
   pattack
@@ -113,6 +115,8 @@ to back-level
 end
 
 to back-plevel
+  if level <= 0
+  [ user-message "Not a valid level"]
   set level level - 1
   load-test-map
 end
@@ -122,7 +126,10 @@ to go
   check-enemies
   check-boss
   check-gold
+  check-win
+  check-gameover
   increment-time
+  
 end
 
 to setup-player
@@ -212,7 +219,7 @@ if time <= 3
    if pcolor = white
    [
      ask enemy
-     [setxy random-pxcor random-pycor]
+     [fd -5]
     ]
 
  ]
@@ -331,6 +338,26 @@ ask gold
      ;;[setxy random-pxcor random-pycor]
     ;; ]
  ]
+end
+
+to check-win
+  if win? = true
+  [
+    user-message "You Win !"
+    clear-all
+    reset
+    set level level + 1
+    load-test-map
+    ]
+end
+to check-gameover
+  if game-over? = true
+  [
+    if user-yes-or-no? "Do you want to try again ?"
+    [
+    test-map
+    ]
+    ]
 end
 
 to Move_Forward
@@ -637,9 +664,11 @@ to loot-gold
 end
 
 to check-player
+  
 if dead? = true
 [
   user-message "YOU DIED !"
+  set game-over?  true 
 ]
  ask player
  [
@@ -647,6 +676,7 @@ if dead? = true
    if score >= 50
    [
    set plevel 2  
+   set health 3
    ]
    if score >= 100
    [
@@ -671,10 +701,15 @@ to increment-time
   
   if time > 59
   [ 
+    set jlevel 2
+    set jattack 4
+    ]
   
   if time > 119
+  [ 
     set jlevel 3
     set jattack 5
+    ]
 end
 
 to reset
@@ -1029,10 +1064,10 @@ NIL
 1
 
 MONITOR
-92
-490
-149
-535
+559
+486
+616
+531
 NIL
 dead?
 17
@@ -1607,6 +1642,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
+NetLogo 5.2-RC3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
