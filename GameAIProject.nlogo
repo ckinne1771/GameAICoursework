@@ -136,7 +136,7 @@ to setup-player
     set heading 0
     set health 3
     set plevel 1
-    set pattack 2
+    set pattack 2 
   ]
   check-player
  
@@ -352,10 +352,10 @@ to playerForward
     [
       if not any? enemy-on patch-ahead 1
       [
-         if not any? boss-on patch-ahead 1
-         [
-           fd 1
-         ]
+        if not any? boss-on patch-ahead 1
+        [
+        fd 1
+        ]
       ]
       
       if pcolor = black
@@ -391,10 +391,10 @@ to playerBackwards
     [
       if not any? enemy-on patch-ahead 1
       [
-         if not any? boss-on patch-ahead 1
-         [
-           fd 1
-         ]
+        if not any? boss-on patch-ahead 1
+        [
+        fd 1
+        ]
       ]
       
       if pcolor = black
@@ -427,12 +427,12 @@ to playerLeft
     set heading 270
     if pycor != min-pycor
     [
-   if not any? enemy-on patch-ahead 1
+    if not any? enemy-on patch-ahead 1
       [
-         if not any? boss-on patch-ahead 1
-         [
-           fd 1
-         ]
+        if not any? boss-on patch-ahead 1
+        [
+        fd 1
+        ]
       ]
       
       if pcolor = black
@@ -467,10 +467,10 @@ to playerRight
     [
     if not any? enemy-on patch-ahead 1
       [
-         if not any? boss-on patch-ahead 1
-         [
-           fd 1
-         ]
+        if not any? boss-on patch-ahead 1
+        [
+        fd 1
+        ]
       ]
       
       if pcolor = black
@@ -646,8 +646,7 @@ if dead? = true
    ;;loot-gold
    if score >= 50
    [
-   set plevel 2 
-   set health 3 
+   set plevel 2  
    ]
    if score >= 100
    [
@@ -672,15 +671,10 @@ to increment-time
   
   if time > 59
   [ 
-     set jlevel 2
-     set jattack 4
-  ]
   
   if time > 119
-  [
     set jlevel 3
     set jattack 5
-  ]
 end
 
 to reset
@@ -1613,7 +1607,6 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
