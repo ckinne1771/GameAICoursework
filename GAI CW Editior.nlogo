@@ -1,17 +1,25 @@
 breed [player player1]
-player-own [ new-heading ]
-breed [enemies enemy]
-;;breed [jake jake1]
+breed [enemy enemy1]
+breed [boss jake]
 breed [gold treasure]
 
 globals [
-  time
-  level         ;; Current Level
-  ;;level-over?   ;; True when a level is complete
-  ;;dead?         ;; True when pacman is loses a life
-  tool          ;; The currently selected tool
+  time 
+  level
+  dead?
+  game-over?
+  win?
+  tool
   Loot
   Score
+  playerCorX 
+  playerCorY 
+  damage
+  phealth
+  plevel
+  jlevel
+  pattack
+  jattack
 ]
 
 to setup 
@@ -20,8 +28,8 @@ to setup
     ca
     set level 0
     set Score 0
-    ;;set level-over? false
-    ;;set dead? false
+    set game-over? false
+    set dead? false
     set tool "Clear"
     
     create-player 1
@@ -31,12 +39,12 @@ to setup
     setxy 2 2
     ]
     
- ;;   create-jake 1
- ;;   [
- ;;   set shape "Jake"  
- ;;   set size 2 
-  ;;  setxy 1 1 
-  ;;  ]
+    create-boss 1
+    [
+    set shape "J.a.k.e"  
+    set size 3
+    setxy 1 1 
+    ]
  
     
     ask patches 
@@ -59,8 +67,8 @@ to create
     if tool = "Draw Player"
     [ place-player ]
     
-    ;;if tool = "Draw Jake"
-    ;;[ place-jake ]
+    if tool = "Draw Jake"
+    [ place-jake ]
     
     if tool = "Draw Enemies"
     [ place-enemies ]
@@ -76,7 +84,7 @@ to clear
     set pcolor grey
     if any? turtles-here
    [ ask gold-here[die]
-    ask enemies-here [die]]
+    ask enemy-here [die]]
     
   ]
 end
@@ -97,14 +105,14 @@ to place-player
   ]
 end
 
-;;to place-jake
-;;  ifelse [pcolor] of patch round mouse-xcor mouse-ycor != grey
- ;; [user-message "Cannot be placed here"]
-;;  [
-;;  ask jake
-;;  [ setxy (round mouse-xcor) (round mouse-ycor) ]
-;;  ]
-;;end
+to place-jake
+  ifelse [pcolor] of patch round mouse-xcor mouse-ycor != grey
+ [user-message "Cannot be placed here"]
+  [
+  ask boss
+  [ setxy (round mouse-xcor) (round mouse-ycor) ]
+  ]
+end
 
 to place-enemies
   ask patch (round mouse-xcor) (round mouse-ycor)
@@ -114,10 +122,11 @@ to place-enemies
     [
       if not any? turtles-here
       [
-        sprout-enemies 1
+        sprout-enemy 1
         [
           set color red
-          set shape "person"
+          set size 2
+          set shape "witch"
         ]
       ]
     ]
@@ -142,9 +151,6 @@ to place-gold
   ]        
 end
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Saving and Loading Procedures ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Change the Level
 to set-level
@@ -180,7 +186,6 @@ to save-level
   [ user-message "Save Canceled. File not saved." ]
 end
 
-;; Load a level
 to load-level
   let choice 0
   while[ choice <= 0 ]
@@ -447,6 +452,23 @@ NIL
 NIL
 1
 
+BUTTON
+129
+473
+192
+506
+Boss
+set tool \"Draw Jake\"
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -634,6 +656,25 @@ Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
 
+j.a.k.e
+false
+0
+Polygon -16777216 true false 95 48 150 49 165 122 165 222 261 222 253 228 95 229 96 138 89 116 91 49
+Circle -2674135 true false 97 75 8
+Circle -2674135 true false 112 72 12
+Rectangle -1 true false 98 93 101 98
+Rectangle -1 true false 99 101 102 105
+Rectangle -1 true false 101 95 105 101
+Rectangle -1 true false 107 97 112 102
+Rectangle -1 true false 103 103 105 106
+Rectangle -1 true false 108 103 113 108
+Rectangle -1 true false 114 101 117 103
+Rectangle -1 true false 114 104 117 108
+Rectangle -1 true false 119 97 124 102
+Rectangle -1 true false 118 105 124 109
+Rectangle -1 true false 126 100 130 103
+Rectangle -1 true false 126 94 131 98
+
 knight
 false
 9
@@ -673,6 +714,149 @@ Rectangle -7500403 true false 42 224 103 246
 Rectangle -1 false false 42 224 104 245
 Rectangle -1 false false 166 221 227 244
 Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
+
+knight down
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 180 60
+Rectangle -7500403 true false 120 45 150 90
+Rectangle -7500403 true false 45 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 45 105 105 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Rectangle -7500403 true false 125 175 145 194
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Rectangle -7500403 true false 150 105 210 165
+Rectangle -1 false false 150 105 210 165
+Rectangle -1 false false 124 174 145 195
+Polygon -13791810 true true 132 34 119 48 119 124 119 165 147 165 147 47 132 34
+Rectangle -1 false false 145 165 176 195
+Rectangle -1184463 true false 112 163 155 175
+Polygon -1 false false 133 35 119 47 120 161 113 161 114 172 155 174 155 162 148 161 147 46 133 37
+
+knight left
+false
+9
+Rectangle -7500403 true false 105 30 225 120
+Rectangle -16777216 true false 105 45 210 60
+Rectangle -7500403 true false 135 45 150 90
+Rectangle -7500403 true false 195 105 270 165
+Rectangle -7500403 false false 210 165 240 210
+Rectangle -7500403 true false 210 165 240 210
+Rectangle -1 false false 194 105 270 165
+Rectangle -1 false false 209 165 239 211
+Line -1 false 225 30 225 105
+Line -1 false 105 30 225 30
+Line -1 false 105 30 105 120
+Line -1 false 105 120 195 120
+Polygon -13791810 true true 63 34 76 48 76 124 76 165 48 165 48 47 63 34
+Rectangle -1184463 true false 40 163 83 175
+Rectangle -7500403 true false 50 175 70 194
+Polygon -7500403 true false 76 162 110 121 133 121 83 193 70 194 71 174 83 174 83 162 76 161
+Rectangle -7500403 false false 85 112 105 148
+Rectangle -7500403 true false 83 111 104 158
+Rectangle -7500403 true false 104 120 193 221
+Line -1 false 104 110 194 109
+Rectangle -7500403 true false 203 195 248 222
+Rectangle -1 false false 204 194 248 223
+Polygon -7500403 true false 193 166 208 165 208 192 203 192 203 221 192 221 192 165 207 164
+Line -1 false 201 221 102 221
+Line -1 false 103 163 103 220
+Line -1 false 104 110 103 220
+Rectangle -1 false false 82 110 104 157
+Line -1 false 102 164 83 191
+Line -1 false 80 155 75 161
+Rectangle -1 false false 50 174 71 195
+Line -1 false 81 191 70 195
+Rectangle -7500403 true false 73 221 134 243
+Rectangle -7500403 true false 197 224 258 246
+Rectangle -1 false false 196 224 258 245
+Rectangle -1 false false 73 221 134 244
+Polygon -1 false false 62 35 76 47 75 161 82 161 81 172 40 174 40 162 47 161 48 46 62 37
+
+knight right
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -16777216 true false 90 45 195 60
+Rectangle -7500403 true false 150 45 165 90
+Rectangle -7500403 true false 30 105 105 165
+Rectangle -7500403 false false 60 165 90 210
+Rectangle -7500403 true false 60 165 90 210
+Rectangle -1 false false 30 105 106 165
+Rectangle -1 false false 61 165 91 211
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Polygon -13791810 true true 237 34 224 48 224 124 224 165 252 165 252 47 237 34
+Rectangle -1184463 true false 217 163 260 175
+Rectangle -7500403 true false 230 175 250 194
+Polygon -7500403 true false 224 162 190 121 167 121 217 193 230 194 229 174 217 174 217 162 224 161
+Rectangle -7500403 false false 195 112 215 148
+Rectangle -7500403 true false 196 111 217 158
+Rectangle -7500403 true false 107 120 196 221
+Line -1 false 196 110 106 109
+Rectangle -7500403 true false 52 195 97 222
+Rectangle -1 false false 52 194 96 223
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Line -1 false 197 163 197 220
+Line -1 false 196 110 197 220
+Rectangle -1 false false 196 110 218 157
+Line -1 false 198 164 217 191
+Line -1 false 220 155 225 161
+Rectangle -1 false false 229 174 250 195
+Line -1 false 219 191 230 195
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Polygon -1 false false 238 35 224 47 225 161 218 161 219 172 260 174 260 162 253 161 252 46 238 37
+
+knight up
+false
+9
+Rectangle -7500403 true false 75 30 195 120
+Rectangle -7500403 true false 45 105 105 165
+Rectangle -1 false false 45 105 105 165
+Line -1 false 75 30 75 105
+Line -1 false 195 30 75 30
+Line -1 false 195 30 195 120
+Line -1 false 195 120 105 120
+Rectangle -7500403 true false 125 175 145 194
+Line -1 false 196 110 106 109
+Polygon -7500403 true false 107 166 92 165 92 192 97 192 97 221 108 221 108 165 93 164
+Line -1 false 99 221 198 221
+Rectangle -7500403 true false 166 221 227 243
+Rectangle -7500403 true false 42 224 103 246
+Rectangle -1 false false 42 224 104 245
+Rectangle -1 false false 166 221 227 244
+Rectangle -7500403 true false 165 105 225 165
+Rectangle -1 false false 165 105 225 165
+Rectangle -7500403 true false 75 105 195 225
+Rectangle -7500403 true false 195 165 210 195
+Rectangle -7500403 true false 196 196 220 220
+Rectangle -1 false false 197 165 211 195
+Rectangle -1 false false 195 196 221 221
+Rectangle -1 false false 75 105 195 225
 
 leaf
 false
@@ -815,6 +999,29 @@ Line -7500403 true 216 40 79 269
 Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
+
+witch
+false
+0
+Polygon -16777216 true false 91 160 32 287 191 287 106 118
+Circle -2064490 true false 64 88 90
+Circle -11221820 true false 124 118 13
+Circle -16777216 true false 128 122 6
+Polygon -16777216 true false 93 167 122 161
+Line -16777216 false 95 164 113 168
+Circle -11221820 true false 79 119 13
+Circle -16777216 true false 82 122 6
+Circle -11221820 true false 124 118 14
+Circle -16777216 true false 127 121 8
+Polygon -1184463 true false 70 137 95 104 102 130 123 106 123 124 140 112 192 268 232 210 131 78 87 79 1 229 26 270 90 79
+Line -16777216 false 103 136 97 149
+Line -16777216 false 97 149 104 152
+Polygon -13345367 true false 73 105 157 94 140 83 103 16 75 94 59 106
+Polygon -16777216 true false 101 65 107 45 112 66 126 64 114 76 126 88 106 79 92 89 99 74 86 70
+Polygon -2064490 true false 67 211 85 249 56 237
+Polygon -2064490 true false 157 218 172 246 138 250 158 216
+Line -6459832 false 141 253 120 212
+Polygon -1184463 true false 114 207 112 191 123 203 142 202 130 213 140 229 123 221 112 235 113 215 99 212
 
 wolf
 false

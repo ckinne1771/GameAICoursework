@@ -87,7 +87,7 @@ end
 
 to load-map  
  set score 0
- let maps ["gamemap1.csv"]
+ let maps ["gamemap1.csv" "gamemap2.csv" "gamemap3.csv" "gamemap4.csv" ]
  
  ifelse ((level - 1) < length maps)
  [
@@ -116,7 +116,7 @@ end
 
 to back-plevel
   if level <= 0
-  [ user-message "Not a valid level"]
+  [ user-message "Not a valid level" stop]
   set level level - 1
   load-test-map
 end
