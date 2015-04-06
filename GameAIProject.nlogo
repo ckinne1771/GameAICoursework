@@ -540,7 +540,7 @@ to enemyMove
     
     if state = "combat"
     [
-      bossKombat
+      enemyKombat
     ]
     
     ifelse any? player in-radius 3
@@ -601,7 +601,7 @@ to bossMove
     
     if jstate = "combat"
     [
-      enemyKombat
+      bossKombat
     ]
     
     if any? player in-radius 3
