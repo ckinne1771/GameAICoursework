@@ -187,6 +187,7 @@ to Kombat
           if health <= 0
           [
             die
+            set score score + 10
           ]
         ]
         
@@ -198,6 +199,7 @@ to Kombat
           if health <= 0
           [
             die
+            set score score + 50
           ]
         ]  
      
@@ -677,11 +679,13 @@ if dead? = true
    [
    set plevel 2  
    set health 3
+   set pattack 3
    ]
    if score >= 100
    [
     set plevel 3
     set health 4
+    set pattack 4
    ] 
    if time <= 3
    [ 
@@ -1642,7 +1646,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2-RC3
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
