@@ -1,3 +1,6 @@
+;; Turtle breeds and global variables
+;;important note these breeds and global variables are all passed to the 
+;; parent model and must match the parent model
 breed [player player1]
 breed [enemy enemy1]
 breed [boss jake]
@@ -21,7 +24,8 @@ globals [
   pattack
   jattack
 ]
-
+;; Setup method which is reponsible for clearing the viewer and setting the player and 
+;;JAKE turtles. With suitable user message alerting them that everything will clear
 to setup 
   if user-yes-or-no? "Do you want to clear current level?"
   [
@@ -51,7 +55,8 @@ to setup
   [ set pcolor grey]
     ]
 end
-
+;;Method detects mouse clicks with various buttons which update depending which tool is
+;; selected, this is used for calling the tools independent methods.
 to create
   if mouse-down?
   [
@@ -77,7 +82,7 @@ to create
     [ place-gold ]
   ]
 end
-
+;;The clean tool which removes turtles and changes the patches back to default gray
 to clear
   ask patch (round mouse-xcor) (round mouse-ycor)
   [
@@ -88,7 +93,7 @@ to clear
     
   ]
 end
-
+;; Draws the walls of the level and can be used draw a border
 to draw-boundary [ boundary-color ]
   ask patch (round mouse-xcor) (round mouse-ycor)
   [
@@ -96,6 +101,7 @@ to draw-boundary [ boundary-color ]
   ]
 end
 
+;; Tool which finds the mouse coordinates and moves the player turtle at location
 to place-player
   ifelse [pcolor] of patch round mouse-xcor mouse-ycor != white
   [user-message "Must be placed in the player spawn "]
@@ -105,6 +111,7 @@ to place-player
   ]
 end
 
+;; similiar to Player place method but with the JAKE turtle
 to place-jake
   ifelse [pcolor] of patch round mouse-xcor mouse-ycor != grey
  [user-message "Cannot be placed here"]
@@ -114,6 +121,9 @@ to place-jake
   ]
 end
 
+
+;;This method is responsible for spawning enemies at the mouse pointer, as little or as 
+;;many enemies the user wants
 to place-enemies
   ask patch (round mouse-xcor) (round mouse-ycor)
   [
@@ -133,6 +143,7 @@ to place-enemies
   ]          
 end
 
+;;Same as enemy spawn/place code but with the gold coin turtles
 to place-gold
   ask patch (round mouse-xcor) (round mouse-ycor)
   [
@@ -152,7 +163,8 @@ to place-gold
 end
 
 
-;; Change the Level
+;; Change the Level, this assigns the level created a value i.e 1 or 2 = level 1, level 2
+;; Code also requires positive number as the file cant be created with a negative number
 to set-level
   if level > 0
   [
@@ -169,7 +181,8 @@ to set-level
   set level temp
 end
 
-
+;; Saves the level, this takes the current level and saves it as .csv file (Comma seperated values)
+;;This will default save to the users documents when used
 to save-level
   if level <= 0
   [
@@ -186,6 +199,8 @@ to save-level
   [ user-message "Save Canceled. File not saved." ]
 end
 
+;;Load level, this takes in a number from the user which corresponds with a level previously saved 
+;; This takes in all the values of the saved level and allows editing to take place
 to load-level
   let choice 0
   while[ choice <= 0 ]
