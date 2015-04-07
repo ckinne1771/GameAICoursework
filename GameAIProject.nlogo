@@ -202,6 +202,7 @@ to Kombat
         [
           set state "combat"
           set damage random pattack
+          print damage
           set health health - damage
           if health <= 0
           [
@@ -214,6 +215,7 @@ to Kombat
         [
           set jstate "combat"
           set damage random pattack
+          print damage
           set health health - damage
           if health <= 0
           [
@@ -280,7 +282,7 @@ to enemyKombat
       if health <= 0
       [
         set dead? true
-       ;; die
+        die
         ;;stop
       ]
     ]
@@ -300,7 +302,7 @@ to bossKombat
       if health <= 0
       [
         set dead? true
-       ;; die
+        die
         ;;stop
       ]
     ]
@@ -344,7 +346,7 @@ to enemyNavigate
 end
 
 
-;;Stops the gold spawning in hte walls or the player spawn
+;;Stops the gold spawning in the walls or the player spawn
 to check-gold
 ask gold
  [
@@ -1704,7 +1706,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2-RC3
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

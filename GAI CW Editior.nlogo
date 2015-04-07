@@ -6,6 +6,31 @@ breed [enemy enemy1]
 breed [boss jake]
 breed [gold treasure]
 
+enemy-own 
+[
+  state
+  health
+  index
+  headings
+]
+
+;;Adds variables to the player
+player-own
+[
+  health
+  headings
+]
+
+;;Adds variables to the boss
+boss-own
+[
+  jstate
+  health
+  index
+  headings
+]
+
+
 globals [
   time 
   level
@@ -41,6 +66,9 @@ to setup
     set shape "Knight"  
     set size 2
     setxy 2 2
+    set health 3
+    set plevel 1
+    set pattack 2 
     ]
     
     create-boss 1
@@ -48,6 +76,10 @@ to setup
     set shape "J.a.k.e"  
     set size 3
     setxy 1 1 
+    set health 10
+    set jstate "persue"
+    set jlevel 1
+    set jattack 3
     ]
  
     
@@ -137,6 +169,8 @@ to place-enemies
           set color red
           set size 2
           set shape "witch"
+          set health 3
+          set state "patrol"
         ]
       ]
     ]
@@ -1052,7 +1086,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2-RC3
+NetLogo 5.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
