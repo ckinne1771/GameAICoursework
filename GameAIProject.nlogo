@@ -1139,41 +1139,57 @@ Monitors
 1
 
 @#$#@#$#@
+# “J.A.R.G.O.N – or – Just Another Rogue-like Game On NetLogo” by “Cerebral”
+
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+What this model is trying to show is the workings of a “rogue-like” dungeon crawling game. The player has to gain enough experience through items and killing enemies to defeat the boss on the level.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The rules employed here are those of 2 Finite state machines, one for the main boss character shown as the hooded figure 
+![GameAIProject](file:JAKE.png)
+
+, and one for the generic enemy type, shown by the witch sprite.
+
+![GameAIProject](file:Witch.png)
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+There are 2 ways to use this model, the first is as the game, and the second as a level-editor to compliment the game.
+
+### The Game
+In the game, we have the standard Setup, Test, and Play buttons, required of all NetLogo models. At the bottom of our Interface screen we have our Control buttons. These allow for movement of our Knight character, recognisable through.
+![GameAIProject](file:Knight.png)
+
+ You can click the buttons, or use the WASD configuration to move him, or alternatively edit the code controlling the movement to bind the actions to different keys.
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+Pay attention to not only the way in which the enemies move, but _when_ they move.
+Pay attention to when the enemy’s state changes.
+Pay attention to the randomness of the combat ie. The player and enemies can do from 0 to their max attack.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Increase the difficulty by increasing the number of enemies, or decrease it by increasing the number of coins.
+Try to avoid the enemy’s line of sight
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+Create different enemies with different move speed and attack damage.
+Further Jake’s features
 
 ## NETLOGO FEATURES
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Ross Campbell, Liam Dick, Emma Gillespie and Christopher Kinney
 @#$#@#$#@
 default
 true
@@ -1706,7 +1722,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
+NetLogo 5.2-RC3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

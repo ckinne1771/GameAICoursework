@@ -521,39 +521,48 @@ NIL
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+The purpose of this model is to be a Level Editor and creator for JARGON (Game Artificial Intelligence Coursework game from Team 2 Cerebral).
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The model serves as a tool to create .csv (Comma Seperated Value) files that contain all the data that is required to serve as a game level for JARGON. The model can Create/Set, Save or Load .csv files that serve as levels. 
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+The model has a simple user interface where the user can go through the various steps to create their very own level to compliment the main game.
+
+A first time user is recommended to use the Setup button which clears the level and prepares the required assests such as the player, boss and level.
+
+To begin creating the user uses the Start button which is the standard NetLogo Go function. Once activated the user cqn then start selecting all the available tools that they wish to use by clicking the apporpriate button of the tool.
+
+With a selected tool the user then can use the mouse and click whereever they desire to use the selected tools.
+
+Once the user is satisified with their creation they can then use the Set button to assign the level a postive only number then use the Save button to create a .csv file called gamemap(x).csv file.
+
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+The model uses various validations such as requiring a positive number for a new level as a negative number could lead to undesired actions carried out by the Operating System.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+
 
 ## NETLOGO FEATURES
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Created by Liam Dick for Team 2 Cerebral
 @#$#@#$#@
 default
 true
@@ -1086,7 +1095,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.1.0
+NetLogo 5.2-RC3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
