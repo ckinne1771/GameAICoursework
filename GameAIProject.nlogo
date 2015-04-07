@@ -1,9 +1,11 @@
+;;This part of the code establishes the breeds of turtles in the game. It also adds the array extension.
 extensions [array]
 breed [player player1]
 breed [enemy enemy1]
 breed [boss jake]
 breed [gold treasure]
 
+;;Adds variables to the enemies
 enemy-own 
 [
   state
@@ -12,12 +14,14 @@ enemy-own
   headings
 ]
 
+;;Adds variables to the player
 player-own
 [
   health
   headings
 ]
 
+;;Adds variables to the boss
 boss-own
 [
   jstate
@@ -26,7 +30,7 @@ boss-own
   headings
 ]
 
-
+;;Global variables
 globals 
 [ 
   time 
@@ -47,6 +51,7 @@ globals
   jattack
 ]
 
+;;Sets up the game
 to setup
 clear-all
 reset
@@ -57,6 +62,7 @@ load-map
 reset-ticks
 end
 
+;;Sets up the map
 to test-map
 clear-all
 reset
@@ -71,6 +77,7 @@ setup-gold
 reset-ticks
 end
 
+;;Loads a test map for the game
 to load-test-map
   set score 0
   let maps [ "GamePMap1.png" "GamePMap2.png" "GamePMap3.png" ]
@@ -85,6 +92,7 @@ to load-test-map
  ]
 end
 
+;;Load a map for the game
 to load-map  
  set score 0
  let maps ["gamemap1.csv" "gamemap2.csv" "gamemap3.csv" "gamemap4.csv" ]
@@ -99,21 +107,25 @@ to load-map
  ]
 end
 
+;;Load the next level in the sequence
 to next-level
   set level level + 1
   load-map
 end
 
+;;Load the next level's path data
 to next-plevel
   set level level + 1
   load-test-map
 end
 
+;;Load the previous level in the sequence
 to back-level
   set level level - 1
   load-map
 end
 
+;;Load the previous level's patch data
 to back-plevel
   if level <= 0
   [ user-message "Not a valid level" stop]
@@ -121,6 +133,7 @@ to back-plevel
   load-test-map
 end
 
+;;executed when the go button is clicked. Essentially, what happens when we want to start the game.
 to go
   check-player
   check-enemies
@@ -132,6 +145,7 @@ to go
   
 end
 
+;;Spawns the player and sets values for it's variables
 to setup-player
   set-default-shape player "knight down"
   create-player 1
@@ -149,6 +163,7 @@ to setup-player
  
 end
 
+;;Spawns the enemies and sets the values for it's variables.
 to setup-enemies
   set-default-shape enemy "witch"
   create-enemy NumberOfEnemies
@@ -161,6 +176,7 @@ to setup-enemies
   ]    
  end
 
+;;Spawns the boss and sets values for it's variables
 to setup-boss
   set-default-shape boss "j.a.k.e"
   create-Boss 1
@@ -176,6 +192,9 @@ to setup-boss
   check-boss
 end
 
+
+;;Method which governs combat and damage dealt by player. Also kills enemies or the boss if their health drops 
+;;to zero or below.
 to Kombat
   if any? other turtles-on patch-ahead 1
      [
@@ -207,6 +226,7 @@ to Kombat
   
 end
 
+;;Prevents the enemy spawning in walls or the player spawn.
 to check-enemies
 ask enemy
  [
@@ -227,6 +247,7 @@ if time <= 3
  ]
 end
 
+;;Prevents the boss spawning in the walls or the player spawn.
 to check-boss
 ask boss
  [
@@ -247,6 +268,7 @@ if time <= 3
  ]
 end
 
+;;Governs combat and damage dealt for enemies. Kills player if their health drops to 0 or below.
 to enemyKombat
   if any? other turtles-on patch-ahead 1
   [
@@ -264,6 +286,8 @@ to enemyKombat
     ]
   ]
 end
+
+;;Governs combat and damage dealt for the boss. Kills the player if their health drops to zero or below.
 
 to bossKombat
   if any? other turtles-on patch-ahead 1
@@ -283,6 +307,7 @@ to bossKombat
   ]
 end
 
+;;The search algorithm for the enemies and the boss, should they be in the pursue state.
 to enemyNavigate
    ifelse playerCorY < pycor
    [
@@ -318,6 +343,8 @@ to enemyNavigate
   ]
 end
 
+
+;;Stops the gold spawning in hte walls or the player spawn
 to check-gold
 ask gold
  [
@@ -342,6 +369,7 @@ ask gold
  ]
 end
 
+;;Check to see if the player has beat the boss
 to check-win
   if win? = true
   [
@@ -352,6 +380,8 @@ to check-win
     load-test-map
     ]
 end
+
+;;Check to see if the player has died
 to check-gameover
   if game-over? = true
   [
@@ -362,6 +392,7 @@ to check-gameover
     ]
 end
 
+;;Called when the moveforward button is pressed or if the W key is pressed.
 to Move_Forward
   
    playerForward
@@ -370,6 +401,8 @@ to Move_Forward
    loot-gold
 end
 
+;;Moves the player up whilst avoiding moving into a wall. Changes the player sprite to the appropriate one and calls 
+;;"Kombat" if the player tries to move on a space occupied by another enemy
 to playerForward 
   ask player
   [
@@ -400,6 +433,7 @@ to playerForward
   
 end
 
+;;Called when the backwards button is pressed or if the S key is pressed.
 to Backwards
   
   playerBackwards
@@ -409,6 +443,8 @@ to Backwards
   
 end
 
+;;Moves the player down whilst avoiding moving into a wall. Changes the player sprite to the appropriate one and calls 
+;;"Kombat" if the player tries to move on a space occupied by another enemy
 to playerBackwards
    ask player
   [
@@ -438,6 +474,7 @@ to playerBackwards
   
 end
 
+;;Called when the turn left button is pressed or if the A key is pressed
 to turn_left
   
   playerLeft
@@ -447,6 +484,8 @@ to turn_left
   
 end
 
+;;Moves the player left whilst avoiding moving into a wall. Changes the player sprite to the appropriate one and calls 
+;;"Kombat" if the player tries to move on a space occupied by another enemy
 to playerLeft
   ask player
   [
@@ -476,6 +515,7 @@ to playerLeft
   
 end
 
+;;Called when the player presses the move right button or if the D key is pressed
 to turn_right
   
   playerRight
@@ -485,6 +525,8 @@ to turn_right
   
 end
 
+;;Moves the player right whilst avoiding moving into a wall. Changes the player sprite to the appropriate one and calls 
+;;"Kombat" if the player tries to move on a space occupied by another enemy
 to playerRight
   ask player
   [
@@ -513,6 +555,7 @@ to playerRight
   
 end
 
+;;Finite State Machine for the enemy
 to enemyMove
        
     ask enemy
@@ -583,6 +626,7 @@ to enemyMove
    
 end
 
+;;Finite State Machine for the boss
 to bossMove
   
          
@@ -643,7 +687,7 @@ end
     
     
   
-
+;;Sets up the basic values for the gold
 to setup-gold
   set-default-shape gold "circle"
   create-gold NumberOfCoins
@@ -654,6 +698,7 @@ to setup-gold
     ]
 end
 
+;;Adds to player score and deletes a gold coin that shares a space with the player.
 to loot-gold
   ask player[
   if any? gold-here
@@ -665,6 +710,7 @@ to loot-gold
   
 end
 
+;;Checks if the player has died or if the player has leveled up. Also stops the player mving away from the safe zone for 3 seconds.
 to check-player
   
 if dead? = true
@@ -700,6 +746,7 @@ if dead? = true
  
 end
 
+;;Increses the timer by 1 each second and levels up the boss if certain time intervals are met
 to increment-time
   set time timer + 1
   
@@ -716,6 +763,7 @@ to increment-time
     ]
 end
 
+;;resets timer
 to reset
   reset-timer
   set time 0
